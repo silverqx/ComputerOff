@@ -45,6 +45,7 @@ type
 //    FCursorPosition: TPoint;
     procedure SetWindowsTerminateType(const Value: integer);
     procedure ComputerOff;
+    procedure CloseAbortComputerOffModal;
     procedure AbortComputerOff;
     procedure PauseVideoBeforeOff;
     property WindowsTerminateType: integer read FWindowsTerminateType write SetWindowsTerminateType;
@@ -356,6 +357,17 @@ begin
     Close;
 end;
 
+procedure TFormMainForm.CloseAbortComputerOffModal;
+var
+  ActiveWindow: HWND;
+begin
+  ActiveWindow := GetActiveWindow;
+  if IsWindow(ActiveWindow) then
+    SendMessage(ActiveWindow, WM_CLOSE, 0, 0);
+
+  FormMainForm.SendToBack;
+end;
+
 procedure TFormMainForm.PauseVideoBeforeOff;
 begin
     { Pause the Skylink/YouTube video if it's in the foreground, it sends
@@ -398,6 +410,10 @@ begin
 
   ShowTime;
   ProgressBar1.Position := ProgressBar1.Position - 1;
+
+  { Prepare for PauseVideoBeforeOff }
+  if (hour = 0) and (min = 0) and (sec = 10) then
+    CloseAbortComputerOffModal;
 
   { Pause video 8 seconds before a suspend }
   if (hour = 0) and (min = 0) and (sec = 8) then

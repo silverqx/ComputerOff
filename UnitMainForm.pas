@@ -381,8 +381,8 @@ begin
       the ctrl+alt+shift+p keyboard shortcut that is handled by
       the Tampermonkey. }
     ShellExecute(0, nil,
-      PChar('E:\autohotkey\os-global\PauseVideoAtSuspend.ahk'), nil, nil,
-      SW_HIDE);
+      PChar('E:\autohotkey\os-global\ComputerOff\PauseVideoAtSuspend.ahk'),
+      nil, nil, SW_HIDE);
 end;
 
 procedure TFormMainForm.Timer1Timer(Sender: TObject);

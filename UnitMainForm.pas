@@ -48,6 +48,8 @@ type
     procedure CloseAbortComputerOffModal;
     procedure AbortComputerOff;
     procedure PauseVideoBeforeOff;
+    { Get window title }
+    function MUGetWindowText(const AHwnd: HWND): string;
     property WindowsTerminateType: integer read FWindowsTerminateType write SetWindowsTerminateType;
   public
     { Public declarations }
@@ -360,9 +362,14 @@ end;
 procedure TFormMainForm.CloseAbortComputerOffModal;
 var
   ActiveWindow: HWND;
+  LWindowText: string;
 begin
   ActiveWindow := GetActiveWindow;
-  if IsWindow(ActiveWindow) then
+  // Získať názov okna
+  LWindowText := MUGetWindowText(ActiveWindow);
+
+  // Send WM_CLOSE only if the Confirm modal is in the foreground
+  if IsWindow(ActiveWindow) and (LWindowText = 'Confirm') then
     SendMessage(ActiveWindow, WM_CLOSE, 0, 0);
 
   FormMainForm.SendToBack;
@@ -502,6 +509,18 @@ begin
 
   Application.BringToFront;
   OptionsClick(Self);
+end;
+
+function TFormMainForm.MUGetWindowText(const AHwnd: HWND): string;
+var
+  LWindowTextLength: Integer;
+  LWindowTextResult: Integer;
+begin
+  LWindowTextLength := GetWindowTextLength(AHwnd);
+  Inc(LWindowTextLength);
+  SetLength(Result, LWindowTextLength);
+  LWindowTextResult := GetWindowText(AHwnd, PChar(Result), Length(Result));
+  SetLength(Result, LWindowTextResult);
 end;
 
 end.

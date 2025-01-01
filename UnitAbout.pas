@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, XPMan, Vcl.Imaging.pngimage;
+  Buttons, ExtCtrls, Vcl.Imaging.pngimage;
 
 type
   TFormAbout = class(TForm)

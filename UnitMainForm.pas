@@ -1,4 +1,4 @@
-unit UnitMainForm;
+﻿unit UnitMainForm;
 
 interface
 
@@ -426,8 +426,8 @@ begin
   if (hour = 0) and (min = 0) and (sec = 8) then
     PauseVideoBeforeOff;
 
-  { Show dialog that allows to abort off action 2 minutes before }
-  if (hour = 0) and (min = 2) and (sec = 0) then
+  { Show dialog that allows to abort off action 2m55s before, 5s after LG TV }
+  if (hour = 0) and (min = 2) and (sec = 55) then
     AbortComputerOff;
 end;
 

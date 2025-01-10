@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, IniFiles, Vcl.XPMan;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, IniFiles, Vcl.XPMan, Vcl.AppEvnts;
 
 type
   TFormMainForm = class(TForm)
@@ -21,6 +21,7 @@ type
     XPManifest1: TXPManifest;
     Timer2: TTimer;
     TrayIcon1: TTrayIcon;
+    ApplicationEvents1: TApplicationEvents;
     procedure FormDestroy(Sender: TObject);
     procedure Timer2Timer(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -32,11 +33,12 @@ type
     procedure OptionsClick(Sender: TObject);
     procedure QuitClick(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
-    procedure TrayIcon1MouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
     procedure FormCreate(Sender: TObject);
     procedure StopMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure TrayIcon1MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure ApplicationEvents1Minimize(Sender: TObject);
   private
     { Private declarations }
     hour, min, sec : integer;
@@ -75,6 +77,13 @@ begin
   FormAbout.ShowModal;
 end;
 
+procedure TFormMainForm.ApplicationEvents1Minimize(Sender: TObject);
+begin
+  Hide;
+  WindowState := TWindowState.wsMinimized;
+  TrayIcon1.Visible := True;
+end;
+
 procedure TFormMainForm.FormActivate(Sender: TObject);
 begin
   ShowTime;
@@ -110,7 +119,8 @@ end;
 
 procedure TFormMainForm.FormShow(Sender: TObject);
 begin
-  FocusControl(Options);
+  if Options.Enabled then
+    FocusControl(Options);
 end;
 
 procedure TFormMainForm.OptionsClick(Sender: TObject);
@@ -167,7 +177,9 @@ begin
     Start.Click;
 
     { When I click OK in an Options dialog, then the MainWindow can disappear. }
-    FormMainForm.SendToBack;
+    Hide;
+    WindowState := TWindowState.wsMinimized;
+    TrayIcon1.Visible := True;
   end
   else
   begin
@@ -381,7 +393,7 @@ begin
       the ctrl+alt+shift+p keyboard shortcut that is handled by
       the Tampermonkey. }
     ShellExecute(0, nil,
-      PChar('E:\autohotkey\os-global\ComputerOff\PauseVideoAtSuspend.ahk'),
+      PChar('E:\autohotkey\os-global\Src\ComputerOff\PauseVideoAtSuspend.ahk'),
       nil, nil, SW_HIDE);
 end;
 
@@ -490,25 +502,13 @@ begin
   end;
 end;
 
-procedure TFormMainForm.TrayIcon1MouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TFormMainForm.TrayIcon1MouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  if FormOptionsDialog.Visible = True then
-  begin
-    Application.BringToFront;
-    Exit;
-  end;
-
-  with FormOptionsDialog do
-  begin
-    Position := poDesigned;
-    Left := X - Round(Width / 2);
-    { 77px is the height of hidable window's taskbar }
-    Top := (Screen.WorkAreaHeight - Height) - 1 - 77;
-  end;
-
+  TrayIcon1.Visible := False;
+  Show;
+  WindowState := TWindowState.wsNormal;
   Application.BringToFront;
-  OptionsClick(Self);
 end;
 
 function TFormMainForm.MUGetWindowText(const AHwnd: HWND): string;

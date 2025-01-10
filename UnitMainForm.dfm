@@ -978,9 +978,13 @@ object FormMainForm: TFormMainForm
       FEDF0000FEE00000FEAE0000FE0600000000000000008FFFAC41C7FDAC41E3F1
       AC41E1C3AC41F083AC41F007AC41F80FAC41F83FAC41E03FAC41C03FAC41C01F
       AC41E71FAC41FF0FAC41FF07AC41FF87AC41FF83AC41}
-    Visible = True
-    OnMouseUp = TrayIcon1MouseUp
+    OnMouseDown = TrayIcon1MouseDown
     Left = 96
     Top = 96
+  end
+  object ApplicationEvents1: TApplicationEvents
+    OnMinimize = ApplicationEvents1Minimize
+    Left = 58
+    Top = 95
   end
 end

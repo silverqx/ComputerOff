@@ -52,6 +52,7 @@ begin
     begin
       FormMainForm.WindowState := wsMinimized;
       FormMainForm.Show;
+      Winapi.Windows.Beep(3300, 120);
     end;
     Application.CreateForm(TFormOptionsDialog, FormOptionsDialog);
     Application.CreateForm(TFormAbout, FormAbout);

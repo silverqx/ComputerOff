@@ -17,7 +17,7 @@ object FormAbout: TFormAbout
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  Position = poDesigned
+  Position = poScreenCenter
   OnKeyPress = FormKeyPress
   PixelsPerInch = 120
   TextHeight = 17

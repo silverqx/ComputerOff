@@ -1,35 +1,48 @@
 object FormAbout: TFormAbout
   Left = 416
   Top = 325
+  Margins.Left = 4
+  Margins.Top = 4
+  Margins.Right = 4
+  Margins.Bottom = 4
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'O programe ComputerOff'
-  ClientHeight = 159
-  ClientWidth = 258
+  ClientHeight = 199
+  ClientWidth = 325
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -14
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   Position = poDesigned
   OnKeyPress = FormKeyPress
-  TextHeight = 13
+  PixelsPerInch = 120
+  TextHeight = 17
   object Panel1: TPanel
-    Left = 8
-    Top = 8
-    Width = 241
-    Height = 113
+    Left = 10
+    Top = 10
+    Width = 301
+    Height = 141
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     BevelInner = bvRaised
     BevelKind = bkTile
     BevelOuter = bvLowered
     TabOrder = 0
     object ProgramIcon: TImage
-      Left = 16
-      Top = 13
+      Left = 20
+      Top = 16
       Width = 60
       Height = 77
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       AutoSize = True
       Picture.Data = {
         0954506E67496D61676589504E470D0A1A0A0000000D494844520000003C0000
@@ -174,15 +187,19 @@ object FormAbout: TFormAbout
       IsControl = True
     end
     object ProductName: TLabel
-      Left = 86
-      Top = 7
-      Width = 104
-      Height = 20
+      Left = 108
+      Top = 9
+      Width = 124
+      Height = 25
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'ComputerOff'
       Color = clBtnFace
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -16
+      Font.Height = -20
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsBold]
       ParentColor = False
@@ -190,46 +207,66 @@ object FormAbout: TFormAbout
       IsControl = True
     end
     object Version: TLabel
-      Left = 89
-      Top = 27
-      Width = 58
-      Height = 13
+      Left = 111
+      Top = 34
+      Width = 71
+      Height = 17
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'verzia 1.3.3'
       IsControl = True
     end
     object Label1: TLabel
-      Left = 89
-      Top = 46
-      Width = 112
-      Height = 16
+      Left = 111
+      Top = 58
+      Width = 140
+      Height = 19
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'by Silver Zachara'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
     end
     object Label2: TLabel
-      Left = 89
-      Top = 70
-      Width = 37
-      Height = 13
+      Left = 111
+      Top = 88
+      Width = 46
+      Height = 17
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'MailTo :'
     end
     object Label3: TLabel
-      Left = 89
-      Top = 86
-      Width = 124
-      Height = 13
+      Left = 111
+      Top = 108
+      Width = 156
+      Height = 17
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'silver.zachara@gmail.com'
     end
   end
   object OKButton: TButton
-    Left = 174
-    Top = 127
-    Width = 75
-    Height = 25
+    Left = 218
+    Top = 159
+    Width = 93
+    Height = 31
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Caption = 'OK'
     Default = True
     ModalResult = 1

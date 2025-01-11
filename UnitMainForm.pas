@@ -377,10 +377,10 @@ var
   LWindowText: string;
 begin
   ActiveWindow := GetActiveWindow;
-  // Získať názov okna
+  { Získať názov okna }
   LWindowText := MUGetWindowText(ActiveWindow);
 
-  // Send WM_CLOSE only if the Confirm modal is in the foreground
+  { Send WM_CLOSE only if the Confirm modal is in the foreground }
   if IsWindow(ActiveWindow) and (LWindowText = 'Confirm') then
     SendMessage(ActiveWindow, WM_CLOSE, 0, 0);
 

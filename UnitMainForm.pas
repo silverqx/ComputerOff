@@ -22,6 +22,7 @@ type
     Timer2: TTimer;
     TrayIcon1: TTrayIcon;
     ApplicationEvents1: TApplicationEvents;
+    procedure WndProc(var Message:TMessage); override;
     procedure FormDestroy(Sender: TObject);
     procedure Timer2Timer(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -53,16 +54,22 @@ type
     { Get window title }
     function MUGetWindowText(const AHwnd: HWND): string;
     property WindowsTerminateType: integer read FWindowsTerminateType write SetWindowsTerminateType;
+    procedure ShowComputerOff;
+    procedure HideComputerOff;
   public
     { Public declarations }
     procedure SetTime;
     procedure ShowTime;
   end;
 
+const
+  IdM_Show = 2;
+
 var
   FormMainForm: TFormMainForm;
   HasPrivateCmd: Boolean = False;
   gForegroundWindow: HWND;
+  RM_CoMain: Cardinal;
 
 implementation
 
@@ -79,9 +86,7 @@ end;
 
 procedure TFormMainForm.ApplicationEvents1Minimize(Sender: TObject);
 begin
-  Hide;
-  WindowState := TWindowState.wsMinimized;
-  TrayIcon1.Visible := True;
+  HideComputerOff;
 end;
 
 procedure TFormMainForm.FormActivate(Sender: TObject);
@@ -177,9 +182,7 @@ begin
     Start.Click;
 
     { When I click OK in an Options dialog, then the MainWindow can disappear. }
-    Hide;
-    WindowState := TWindowState.wsMinimized;
-    TrayIcon1.Visible := True;
+    HideComputerOff;
   end
   else
   begin
@@ -231,6 +234,21 @@ begin
     Label2.Caption := Label2.Caption + IntToStr(sec)
   else
     Label2.Caption := Label2.Caption + '0' + IntToStr(sec);
+end;
+
+procedure TFormMainForm.HideComputerOff;
+begin
+  Hide;
+  WindowState := TWindowState.wsMinimized;
+  TrayIcon1.Visible := True;
+end;
+
+procedure TFormMainForm.ShowComputerOff;
+begin
+  TrayIcon1.Visible := False;
+  Show;
+  WindowState := TWindowState.wsNormal;
+  Application.BringToFront;
 end;
 
 procedure TFormMainForm.StartClick(Sender: TObject);
@@ -505,10 +523,7 @@ end;
 procedure TFormMainForm.TrayIcon1MouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  TrayIcon1.Visible := False;
-  Show;
-  WindowState := TWindowState.wsNormal;
-  Application.BringToFront;
+  ShowComputerOff;
 end;
 
 function TFormMainForm.MUGetWindowText(const AHwnd: HWND): string;
@@ -521,6 +536,19 @@ begin
   SetLength(Result, LWindowTextLength);
   LWindowTextResult := GetWindowText(AHwnd, PChar(Result), Length(Result));
   SetLength(Result, LWindowTextResult);
+end;
+
+procedure TFormMainForm.WndProc(var Message: TMessage);
+begin
+  with Message do
+  begin
+    if Msg = RM_CoMain then
+      case WParam of
+        IdM_Show: ShowComputerOff;
+      end;
+  end; { with Message do }
+
+  inherited;
 end;
 
 end.

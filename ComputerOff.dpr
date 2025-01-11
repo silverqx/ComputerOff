@@ -20,6 +20,7 @@ uses
 const
   Mg_App_Title = 'ComputerOff';
   Mg_Mx_One_Instance = 'Global\' + Mg_App_Title + 'App';
+  MSG_CoShow = 'MSG_CoShow';
   Ec_Already_Running = 1;
 
 var
@@ -35,11 +36,17 @@ begin
   if FindCmdLineSwitch('private') then
     HasPrivateCmd := True;
 
+  RM_CoMain := RegisterWindowMessage(MSG_CoShow);
+
   hMutex := CreateMutex(nil, False, PChar(Mg_Mx_One_Instance));
   try
     { Only one instance can be running. }
     if GetLastError = ERROR_ALREADY_EXISTS then
-      Halt(Ec_Already_Running);
+    begin
+      { Restore from the tray icon }
+      PostMessage(HWND_BROADCAST, RM_CoMain, IdM_Show, 0);
+      ExitProcess(Ec_Already_Running);
+    end;
 
     Application.Initialize;
     Application.MainFormOnTaskbar := True;

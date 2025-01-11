@@ -298,7 +298,7 @@ end;
 procedure TFormMainForm.StopClick(Sender: TObject);
 begin
   { Stop hide ComputerOff timer }
-  if Timer2.Interval = 1300 then
+  if Timer2.Interval = 2000 then
     Timer2.Enabled := False;
 
   ProgressBar1.Enabled := false;
@@ -523,8 +523,8 @@ begin
     Options.Click;
   end
 
-  { Lookup to ComputerOff application for 1.3s }
-  else if Timer2.Interval = 1300 then
+  { Lookup to ComputerOff application for 2s }
+  else if Timer2.Interval = 2000 then
   begin
     Timer2.Enabled := False;
     { Don't hide if countdown isn't running }
@@ -560,8 +560,8 @@ begin
         IdM_Show:
         begin
           ShowComputerOff;
-          { Hide after 1.3s }
-          Timer2.Interval := 1300;
+          { Hide after 2s }
+          Timer2.Interval := 2000;
           Timer2.Enabled := True;
         end;
       end;

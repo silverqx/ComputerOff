@@ -18,8 +18,8 @@ uses
 {$R *.res}
 
 const
-  Mg_App_Title = 'ComputerOff';
-  Mg_Mx_One_Instance = 'Global\' + Mg_App_Title + 'App';
+  Co_App_Title = 'ComputerOff';
+  Co_Mx_One_Instance = 'Global\' + Co_App_Title + 'App';
   MSG_CoShow = 'MSG_CoShow';
   Ec_Already_Running = 1;
 
@@ -38,7 +38,7 @@ begin
 
   RM_CoMain := RegisterWindowMessage(MSG_CoShow);
 
-  hMutex := CreateMutex(nil, False, PChar(Mg_Mx_One_Instance));
+  hMutex := CreateMutex(nil, False, PChar(Co_Mx_One_Instance));
   try
     { Only one instance can be running. }
     if GetLastError = ERROR_ALREADY_EXISTS then
@@ -52,7 +52,7 @@ begin
     Application.MainFormOnTaskbar := True;
 //    TStyleManager.TrySetStyle('Windows10 Dark');
     TStyleManager.TrySetStyle('Windows10 SlateGray');
-    Application.Title := Mg_App_Title;
+    Application.Title := Co_App_Title;
     Application.CreateForm(TFormMainForm, FormMainForm);
     { Show Minimized }
     if HasPrivateCmd then

@@ -54,15 +54,14 @@ begin
     TStyleManager.TrySetStyle('Windows10 SlateGray');
     Application.Title := Co_App_Title;
     Application.CreateForm(TFormMainForm, FormMainForm);
-    { Show Minimized }
-    if HasPrivateCmd then
-    begin
-      FormMainForm.WindowState := wsMinimized;
-      FormMainForm.Show;
-      Winapi.Windows.Beep(3300, 120);
-    end;
     Application.CreateForm(TFormOptionsDialog, FormOptionsDialog);
     Application.CreateForm(TFormAbout, FormAbout);
+    { Show minimized to tray icon (hidden) }
+    if HasPrivateCmd then
+    begin
+      Application.ShowMainForm := False;
+      Winapi.Windows.Beep(3300, 120);
+    end;
     Application.Run;
   finally
     CloseHandle(hMutex);

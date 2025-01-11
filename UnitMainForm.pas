@@ -100,6 +100,9 @@ begin
   gForegroundWindow := GetForegroundWindow;
 
   ScaleBy(4, 3);
+
+  if HasPrivateCmd then
+    TrayIcon1.Visible := True;
 end;
 
 procedure TFormMainForm.FormDestroy(Sender: TObject);
@@ -124,7 +127,10 @@ end;
 
 procedure TFormMainForm.FormShow(Sender: TObject);
 begin
-  if Options.Enabled then
+  if Stop.Enabled and Timer1.Enabled then
+    FocusControl(Stop)
+
+  else if Options.Enabled then
     FocusControl(Options);
 end;
 
@@ -291,7 +297,6 @@ begin
     ProgressBar1.Enabled := true;
     ProgressBar1.Max := ((hour * 60 * 60) + (min * 60) + (sec));
     ProgressBar1.Position := ((hour * 60 * 60) + (min * 60) + (sec));
-    FocusControl(Stop);
   end;
 end;
 

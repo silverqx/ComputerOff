@@ -18,7 +18,6 @@ object FormMainForm: TFormMainForm
   Font.Style = []
   KeyPreview = True
   Position = poScreenCenter
-  Visible = True
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy

@@ -564,6 +564,8 @@ begin
       case WParam of
         IdM_Show:
         begin
+          { Remeber the current foreground window }
+          gForegroundWindow := GetForegroundWindow;
           ShowComputerOff;
           { Hide after 2s }
           Timer2.Interval := 2000;

@@ -28,6 +28,8 @@
 *.projdata
 *.tvsconfig
 *.dsk
+*.dsv
+*.vlb
 
 # Delphi history and backups
 __history/
@@ -39,3 +41,5 @@ Win32/
 Win64/
 *.res
 *.bak
+/TODOS.*.txt
+

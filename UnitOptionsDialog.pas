@@ -3,38 +3,47 @@ unit UnitOptionsDialog;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Spin, ExtCtrls;
+  Winapi.Windows, System.Classes,
+  Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Samples.Spin;
 
 type
   TFormOptionsDialog = class(TForm)
-    Bevel1: TBevel;
-    Label1: TLabel;
-    SpinEdit1: TSpinEdit;
-    SpinEdit2: TSpinEdit;
-    SpinEdit3: TSpinEdit;
-    OK: TButton;
+    PanellMain: TPanel;
     Cancel: TButton;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    ComboBox1: TComboBox;
-    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    ComputerOffType: TComboBox;
+    Hour: TSpinEdit;
+    LabelColon1: TLabel;
+    LabelColon2: TLabel;
+    LabelComputerOffType: TLabel;
+    LabelTimeout: TLabel;
+    Minute: TSpinEdit;
+    OK: TButton;
+    Second: TSpinEdit;
+    TimerComboBoxDropDown: TTimer;
+
     procedure FormShow(Sender: TObject);
-    procedure SpinEdit3Change(Sender: TObject);
-    procedure SpinEdit2Change(Sender: TObject);
-    procedure SpinEdit1Change(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint;
-      var Handled: Boolean);
-    procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint;
-      var Handled: Boolean);
-    procedure FormMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-  private
-    { Private declarations }
-    function FindSpinEdit(const AMousePos: TPoint): TSpinEdit;
-  public
-    { Public declarations }
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+
+    procedure FormMouseUp(
+      Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure FormMouseWheelUp(
+      Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure FormMouseWheelDown(
+      Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+
+    procedure HourChange(Sender: TObject);
+    procedure MinuteChange(Sender: TObject);
+    procedure SecondChange(Sender: TObject);
+
+    procedure ComputerOffTypeChange(Sender: TObject);
+
+    procedure TimerComboBoxDropDownTimer(Sender: TObject);
+    procedure ComputerOffTypeDropDown(Sender: TObject);
+    procedure ComputerOffTypeCloseUp(Sender: TObject);
+
+  strict private
+    FComputerOffTypeOpened: Boolean;
+    function FindSpinEdit(const AMousePosition: TPoint): TSpinEdit;
   end;
 
 var
@@ -42,122 +51,177 @@ var
 
 implementation
 
-uses System.Types, UnitMainForm;
+uses UnitCommon, UnitMainForm;
 
 {$R *.dfm}
 
-procedure TFormOptionsDialog.FormCreate(Sender: TObject);
+{ published }
+
+procedure TFormOptionsDialog.FormShow(Sender: TObject);
 begin
-  ScaleBy(3, 2);
+  FocusControl(Minute);
+
+  { Center the mouse cursor in the given control }
+  CenterMouse(OK, False);
 end;
 
 procedure TFormOptionsDialog.FormKeyPress(Sender: TObject; var Key: Char);
 begin
-  if Key = #13 then
-  begin
-    ModalResult := mrOk;
-    Key := #0;
-  end;
+  { TComboBox uses Enter and Esc during opened drop-down list }
+  if (ActiveControl = ComputerOffType) and FComputerOffTypeOpened then
+    Exit;
 
-  if Key = #27 then
-    ModalResult := mrCancel;  
+  { Enter }
+  if Key = Char(VK_RETURN) then
+    ModalResult := mrOk
+
+  { Esc }
+  else if Key = Char(VK_ESCAPE) then
+    ModalResult := mrCancel;
 end;
 
-procedure TFormOptionsDialog.FormShow(Sender: TObject);
+procedure TFormOptionsDialog.FormMouseUp(
+  Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  pt: TPoint;
+  LIsLeftButton: Boolean;
 begin
-  SetFocus;
-  FocusControl(SpinEdit2);
-  SpinEdit1.Value := 1;
-  SpinEdit2.Value := 0;
-  SpinEdit3.Value := 0;
+  LIsLeftButton := Button = mbLeft;
 
-  // Center Mouse Cursor in OK button
-  pt := Point(OK.Left + Round(OK.Width / 2), OK.Top + Round(OK.Height / 2));
-  pt := ClientToScreen(pt);
-  SetCursorPos(pt.X, pt.Y);
+  { Don't handle left mouse clicks on TButton-s }
+  if LIsLeftButton and (Sender is TButton) then
+    Exit;
+
+  { Focus the next/previous control on right/left mouse clicks }
+  if LIsLeftButton or (Button = mbMiddle) then
+    SelectNext(ActiveControl, False, True)
+
+  else if Button = mbRight then
+    SelectNext(ActiveControl, True, True);
 end;
 
-procedure TFormOptionsDialog.SpinEdit1Change(Sender: TObject);
+procedure TFormOptionsDialog.FormMouseWheelDown(
+  Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+var
+  LSpinEdit: TSpinEdit;
 begin
-  if SpinEdit1.Value = -1 then
-    SpinEdit1.Value := 0;
-  if SpinEdit1.Value = 24 then
-    SpinEdit1.Value := 0;
+  LSpinEdit := FindSpinEdit(MousePos);
+
+  { Nothing to do }
+  if LSpinEdit = nil then
+    Exit;
+
+  with LSpinEdit do
+    Value := Value - Increment;
+
+  Handled := True;
 end;
 
-procedure TFormOptionsDialog.SpinEdit2Change(Sender: TObject);
+procedure TFormOptionsDialog.FormMouseWheelUp(
+  Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+var
+  LSpinEdit: TSpinEdit;
 begin
-  if SpinEdit2.Value < 0 then
-  begin
-    if SpinEdit1.Value > 0 then
+  LSpinEdit := FindSpinEdit(MousePos);
+
+  { Nothing to do }
+  if LSpinEdit = nil then
+    Exit;
+
+  with LSpinEdit do
+    Value := Value + Increment;
+
+  Handled := True;
+end;
+
+procedure TFormOptionsDialog.HourChange(Sender: TObject);
+begin
+  with Hour do
+    if Value < 0 then
+      Value := 0 // Don't user 23 here, 0 disables looping over
+
+    else if Value > 23 then
+      Value := 23; // Don't user 0 here, 23 disables looping over
+end;
+
+procedure TFormOptionsDialog.MinuteChange(Sender: TObject);
+begin
+  with Minute do
+    if Value < 0 then
     begin
-      SpinEdit2.Value := 30;
-      SpinEdit1.Value := SpinEdit1.Value - SpinEdit1.Increment;
+      if Hour.Value > 0 then
+      begin
+        Value := 30;
+        with Hour do
+          Value := Value - Increment;
+      end
+      else
+        Value := 0; // Don't user 30 here, 0 disables looping over
     end
-    else
-      SpinEdit2.Value := 0;
-  end;
-  if SpinEdit2.Value > 59 then
-  begin
-    SpinEdit2.Value := 0;
-    SpinEdit1.Value := SpinEdit1.Value + SpinEdit1.Increment;
-  end;
+
+    { Stop incrementing at 23:30:xx }
+    else if (Hour.Value = 23) and (Value > 59) then
+      Value := 30
+
+    else if Value > 59 then
+    begin
+      Value := 0;
+      with Hour do
+        Value := Value + Increment;
+    end;
 end;
 
-procedure TFormOptionsDialog.SpinEdit3Change(Sender: TObject);
+procedure TFormOptionsDialog.SecondChange(Sender: TObject);
 begin
-  if SpinEdit3.Value < 0 then
-    SpinEdit3.Value := 30;
-  if SpinEdit3.Value > 59 then
-    SpinEdit3.Value := 0;
+  with Second do
+    if Value < 0 then
+    begin
+      Value := 30; // Don't user 0 here, 30 allows looping over
+      with Minute do
+        Value := Value - Increment;
+    end
+
+    else if Value > 59 then
+    begin
+      Value := 0;
+      with Minute do
+        Value := Value + Increment;
+    end;
 end;
 
-procedure TFormOptionsDialog.FormMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState;
-  X, Y: Integer);
+procedure TFormOptionsDialog.ComputerOffTypeChange(Sender: TObject);
 begin
-  if Button = mbRight then
-  begin
-    // https://stackoverflow.com/questions/6773400/focus-next-control-on-enter-in-overridden-keyup
-    Perform(CM_DIALOGKEY, VK_TAB, 0);
-  end;
+  { Update it immediately }
+  FormMainForm.PrepareComputerOffType;
 end;
 
-procedure TFormOptionsDialog.FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
-  MousePos: TPoint; var Handled: Boolean);
-var
-  LSpinEdit: TSpinEdit;
+procedure TFormOptionsDialog.TimerComboBoxDropDownTimer(Sender: TObject);
 begin
-  LSpinEdit := FindSpinEdit(MousePos);
-  if LSpinEdit = nil then
-    Exit;
-
-  LSpinEdit.Value := LSpinEdit.Value - LSpinEdit.Increment;
-  Handled := True;
+  TimerComboBoxDropDown.Enabled := False;
+  FComputerOffTypeOpened := False;
 end;
 
-procedure TFormOptionsDialog.FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint;
-  var Handled: Boolean);
-var
-  LSpinEdit: TSpinEdit;
+procedure TFormOptionsDialog.ComputerOffTypeDropDown(Sender: TObject);
 begin
-  LSpinEdit := FindSpinEdit(MousePos);
-  if LSpinEdit = nil then
-    Exit;
-
-  LSpinEdit.Value := LSpinEdit.Value + LSpinEdit.Increment;
-  Handled := True;
+  FComputerOffTypeOpened := True;
 end;
 
-function TFormOptionsDialog.FindSpinEdit(const AMousePos: TPoint): TSpinEdit;
+procedure TFormOptionsDialog.ComputerOffTypeCloseUp(Sender: TObject);
+begin
+  { Timer is needed to keep/extend the open dropdown state long enough }
+  TimerComboBoxDropDown.Enabled := True;
+end;
+
+{ private }
+
+function TFormOptionsDialog.FindSpinEdit(const AMousePosition: TPoint): TSpinEdit;
 var
   LWindow: HWND;
   LWinControl: TWinControl;
 begin
   Result := nil;
 
-  LWindow := WindowFromPoint(AMousePos);
+  { Try to find a control under the cursor }
+  LWindow := WindowFromPoint(AMousePosition);
   if LWindow = 0 then
     Exit;
 
@@ -165,12 +229,14 @@ begin
   if LWinControl = nil then
     Exit;
 
+  { TSpinEdit found }
   if LWinControl is TSpinEdit then
     Exit(LWinControl as TSpinEdit);
 
   if LWinControl.Parent is TSpinEdit then
     Exit(LWinControl.Parent as TSpinEdit);
 
+  { If TSpinEdit has a focus take it }
   if ActiveControl is TSpinEdit then
     Exit(ActiveControl as TSpinEdit);
 end;

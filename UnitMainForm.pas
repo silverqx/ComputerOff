@@ -3,578 +3,881 @@
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, IniFiles, Vcl.XPMan, Vcl.AppEvnts;
+  Winapi.Windows, Winapi.Messages,
+  System.Classes, System.SysUtils, System.IniFiles, System.Generics.Collections,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls,
+  Vcl.AppEvnts;
 
 type
   TFormMainForm = class(TForm)
-    Start: TButton;
-    Stop: TButton;
-    Options: TButton;
+    BevelCountDown: TBevel;
     About: TButton;
+    ApplicationEventsMain: TApplicationEvents;
+    ButtonComputerOff: TButton;
+    LabelComputerOff: TLabel;
+    LabelCountDown: TLabel;
+    Options: TButton;
+    CountDownBar: TProgressBar;
     Quit: TButton;
-    p: TBevel;
-    ProgressBar1: TProgressBar;
-    Label1: TLabel;
-    Label2: TLabel;
-    Timer1: TTimer;
-    XPManifest1: TXPManifest;
-    Timer2: TTimer;
-    TrayIcon1: TTrayIcon;
-    ApplicationEvents1: TApplicationEvents;
-    procedure WndProc(var Message:TMessage); override;
+    Stop: TButton;
+    TimerCommon: TTimer;
+    TimerCountDown: TTimer;
+    TrayIconMain: TTrayIcon;
+    TimerThrottleActivate: TTimer;
+
+    { Constructors }
+    procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Timer2Timer(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-    procedure StopClick(Sender: TObject);
-    procedure Timer1Timer(Sender: TObject);
-    procedure StartClick(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
+
+    { Windows Messages }
+    procedure WndProc(var Message: TMessage); override;
+    procedure ApplicationEventsMainMinimize(Sender: TObject);
+
+    { Timers }
+    procedure TimerCommonTimer(Sender: TObject);
+    procedure TimerCountDownTimer(Sender: TObject);
+
+    { TApplication Events }
+    procedure ApplicationActivate(Sender: TObject);
+    procedure ApplicationMinimize(Sender: TObject);
+
+    { TForm Events }
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+
+    { TControl Events }
     procedure AboutClick(Sender: TObject);
+    procedure ButtonComputerOffClick(Sender: TObject);
     procedure OptionsClick(Sender: TObject);
     procedure QuitClick(Sender: TObject);
-    procedure FormKeyPress(Sender: TObject; var Key: Char);
-    procedure FormCreate(Sender: TObject);
-    procedure StopMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure TrayIcon1MouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure ApplicationEvents1Minimize(Sender: TObject);
-  private
-    { Private declarations }
-    hour, min, sec : integer;
-    FWindowsTerminateType: integer;
-    FEndDateTime: TDateTime;
-//    FCursorPosition: TPoint;
-    procedure SetWindowsTerminateType(const Value: integer);
-    procedure ComputerOff;
-    procedure CloseAbortComputerOffModal;
-    procedure AbortComputerOff;
-    procedure PauseVideoBeforeOff;
-    { Get window title }
-    function MUGetWindowText(const AHwnd: HWND): string;
-    property WindowsTerminateType: integer read FWindowsTerminateType write SetWindowsTerminateType;
-    procedure ShowComputerOff;
-    procedure HideComputerOff;
+    procedure StopClick(Sender: TObject);
+    procedure StopMouseUp(
+      Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+
+    { Tray Icon Events }
+    procedure TrayIconMainMouseDown(
+      Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure TimerThrottleActivateTimer(Sender: TObject);
+
   public
-    { Public declarations }
-    procedure SetTime;
-    procedure ShowTime;
+    { UI CountDown related }
+    procedure PrepareComputerOffType;
+
+  strict private type
+    { Types }
+    TComputerOffTypeString = record
+      Name: string;
+      NameWithAccelerator: string;
+      constructor Create(const AName: string; const ANameWithAccelerator: string);
+    end;
+
+  strict private
+    FCountDownTime: TDateTime;
+    FShuttingDown: Boolean;
+
+    FComputerOffType: Integer;
+    FComputerOffTypeString: TComputerOffTypeString;
+    FComputerOffTypesHash: TDictionary<Integer, TComputerOffTypeString>;
+
+    FComputerOffTimeout: TDateTime;
+    { Secured quit }
+    FComputerOffTimeout4h: TDateTime;
+    { Secured ComputerOff }
+    FComputerOffTimeout1s: TDateTime;
+    { Secured Abort modal }
+    FComputerOffTimeout_SecuredAbortModal: TDateTime;
+
+    FAbortModal: TForm;
+    FAbortModalShown: Boolean;
+
+    FhForegroundWindow: HWND;
+    FCursorPosition: TPoint;
+    FhPowerNotify: HDEVNOTIFY;
+
+    { Initialization }
+    procedure InitComputerOffTypesHash;
+
+    { Persitent Storage }
+    procedure LoadIniFile;
+    procedure SaveIniFile;
+
+    { Startup }
+    procedure Startup;
+    procedure StartupNormal;
+    procedure StartupPrivate;
+
+    { CountDown }
+    procedure HandleMissedTimeouts;
+
+    { OptionsClick }
+    function IsZeroCountDownTime: Boolean;
+
+    { UI CountDown related }
+    procedure StartCountDown;
+
+    procedure UpdateLabelComputerOff;
+    procedure UpdateButtonComputerOff;
+
+    procedure PepareAllCountDownControls;
+    procedure PepareCountDown;
+    procedure PrepareCountDownBar;
+    procedure PepareComputerOffTimeouts;
+    procedure UpdateLabelCountDown;
+
+    function ComputeCountDownBarMax: Integer; inline;
+    function ComputeCountDownBarPosition: Integer;
+    function UpdateCountDownBarPosition: Integer; inline;
+
+    { ComputerOff }
+    procedure PreComputerOff;
+    procedure PauseVideo; inline;
+
+    procedure ComputerOff;
+    function EnableSeShutdownPrivilege: Boolean;
+    procedure InvokeComputerOff;
+
+    { Abort Modal }
+    procedure ShowAbortComputerOffModal;
+    function GetAbortModalMessage: string;
+    procedure FreeAbortModal;
+
+    { Show/Hide/Quit }
+    procedure ShowComputerOff(ARememberForegroundWindow: Boolean = True);
+    procedure HideComputerOff(ARestorePreviousWindow: Boolean = True);
+    procedure FocusAndCenterMouseOnActivate;
+    procedure RestorePreviousWindow;
+
+    procedure QuitApplication;
+
+    { Windows Messages actions }
+    procedure ShowComputerOffFor2s;
+    procedure HideComputerOffAfter2s;
+
+    procedure HandleApmResume; inline;
+    procedure SynchronizeCountDownTimer;
+    procedure QuitOrShowAbortModal;
+
+    { TForm Events }
+    procedure FormShowCenterMouse(Sender: TObject);
   end;
 
 const
-  IdM_Show = 2;
+  MsgId_Show = WPARAM(2);
 
 var
   FormMainForm: TFormMainForm;
   HasPrivateCmd: Boolean = False;
-  gForegroundWindow: HWND;
-  RM_CoMain: Cardinal;
+  RmShowMainForm: Cardinal;
 
 implementation
 
 {$R *.dfm}
 
 uses
-  Winapi.ShellAPI, System.DateUtils, System.Types, System.UITypes,
-  UnitOptionsDialog, UnitAbout;
+  Winapi.ShellAPI, System.DateUtils,
+  UnitConstants, UnitCommon, UnitOptionsDialog, UnitAbout;
 
-procedure TFormMainForm.AboutClick(Sender: TObject);
-begin
-  FormAbout.ShowModal;
-end;
+{ External }
 
-procedure TFormMainForm.ApplicationEvents1Minimize(Sender: TObject);
-begin
-  HideComputerOff;
-end;
+const
+  powrprof = 'powrprof.dll';
 
-procedure TFormMainForm.FormActivate(Sender: TObject);
-begin
-  ShowTime;
-end;
+function RegisterSuspendResumeNotification(hRecipient: THandle; Flags: DWORD): HDEVNOTIFY;
+  external user32;
+function AdjustTokenPrivileges(TokenHandle: THandle; DisableAllPrivileges: BOOL;
+  const NewState: TTokenPrivileges; BufferLength: DWORD; PreviousState: PTokenPrivileges;
+  ReturnLength: PDWORD): BOOL; external advapi32;
+function SetSuspendState(Hibernate, Force, WakeupEventsDisabled: ByteBool): ByteBool;
+  external powrprof;
+
+{ published }
+
+{ Constructors }
 
 procedure TFormMainForm.FormCreate(Sender: TObject);
 begin
-  { Remeber the current foreground window }
-  gForegroundWindow := GetForegroundWindow;
+  { Remember the current foreground window }
+  FhForegroundWindow := GetForegroundWindow;
 
-  ScaleBy(4, 3);
+  InitComputerOffTypesHash;
 
   if HasPrivateCmd then
-    TrayIcon1.Visible := True;
+    TrayIconMain.Visible := True;
+
+  RegisterSuspendResumeNotification(Handle, DEVICE_NOTIFY_WINDOW_HANDLE);
 end;
 
 procedure TFormMainForm.FormDestroy(Sender: TObject);
-var
-  IniFile: TIniFile;
 begin
-  IniFile := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
-  IniFile.WriteInteger('Main', 'Type', WindowsTerminateType);
-  IniFile.Free;
-end;
+  if FhPowerNotify <> nil then
+    UnregisterDeviceNotification(FhPowerNotify);
 
-procedure TFormMainForm.FormKeyPress(Sender: TObject; var Key: Char);
-begin
-  if (Sender = FormMainForm) and (Key = #27) then
-  begin
-    if not Timer1.Enabled then
-      Application.Terminate
-    else
-      SendToBack;
+  FreeAndNil(FComputerOffTypesHash);
+
+  { ChangeFileExt can throw EOutOfMemory, also, the exception handler is necessary
+    because it's called from the destructor). }
+  try
+    SaveIniFile;
+  finally
   end;
 end;
 
-procedure TFormMainForm.FormShow(Sender: TObject);
-begin
-  if Stop.Enabled and Timer1.Enabled then
-    FocusControl(Stop)
-
-  else if Options.Enabled then
-    FocusControl(Options);
-end;
-
-procedure TFormMainForm.OptionsClick(Sender: TObject);
-begin
-  { Save current cursor position }
-//  GetCursorPos(FCursorPosition);
-
-  if Sender = Options then
-    FormOptionsDialog.Position := poScreenCenter;
-
-  if FormOptionsDialog.ShowModal = mrOk then
-  begin
-    { Restore the previously recorded foreground window }
-    SetForegroundWindow(gForegroundWindow);
-
-    { Restore cursor position }
-//    SetCursorPos(FCursorPosition.X, FCursorPosition.Y);
-
-    WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-    if ((FormOptionsDialog.SpinEdit1.Value = 0) and
-      (FormOptionsDialog.SpinEdit2.Value = 0) and
-      (FormOptionsDialog.SpinEdit3.Value = 0))
-    then
-    begin
-      FocusControl(Options);
-      case FormOptionsDialog.ComboBox1.ItemIndex of
-        0:
-          begin
-            WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-            Start.Caption := 'S&uspend';
-            Label1.Caption := 'Time to Suspend2Ram';
-          end;
-        1:
-          begin
-            WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-            Start.Caption := '&Hibernation';
-            Label1.Caption := 'Time to Hibernation';
-          end;
-        2:
-          begin
-            WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-            Start.Caption := '&Turn Off';
-            Label1.Caption := 'Time to Turn Off';
-          end;
-      end;
-    end
-    else
-    begin
-      FocusControl(Start);
-      Start.Caption := '&Start';
-    end;
-
-    SetTime;
-    Start.Click;
-
-    { When I click OK in an Options dialog, then the MainWindow can disappear. }
-    HideComputerOff;
-  end
-  else
-  begin
-    if Label2.Caption = '00:00:00' then
-      FocusControl(Options)
-    else
-      FocusControl(Start);
-  end;
-
-  case FormOptionsDialog.ComboBox1.ItemIndex of
-    0: Label1.Caption := 'Time to Suspend2Ram';
-    1: Label1.Caption := 'Time to Hibernation';
-    2: Label1.Caption := 'Time to Turn Off';
-  end;
-
-  ShowTime;
-end;
-
-procedure TFormMainForm.QuitClick(Sender: TObject);
-begin
-  Application.Terminate;
-end;
-
-procedure TFormMainForm.SetTime;
-begin
-  hour := FormOptionsDialog.SpinEdit1.Value;
-  min := FormOptionsDialog.SpinEdit2.Value;
-  sec := FormOptionsDialog.SpinEdit3.Value;
-end;
-
-procedure TFormMainForm.SetWindowsTerminateType(const Value: integer);
-begin
-  FWindowsTerminateType := Value;
-end;
-
-procedure TFormMainForm.ShowTime;
-begin
-  if hour >= 10 then
-    Label2.Caption := IntToStr(hour) + ':'
-  else
-    Label2.Caption := '0' + IntToStr(hour) + ':';
-
-  if min >= 10 then
-    Label2.Caption := Label2.Caption + IntToStr(min) + ':'
-  else
-    Label2.Caption := Label2.Caption + '0' + IntToStr(min) + ':';
-
-  if sec >= 10 then
-    Label2.Caption := Label2.Caption + IntToStr(sec)
-  else
-    Label2.Caption := Label2.Caption + '0' + IntToStr(sec);
-end;
-
-procedure TFormMainForm.HideComputerOff;
-begin
-  Hide;
-  WindowState := TWindowState.wsMinimized;
-  TrayIcon1.Visible := True;
-end;
-
-procedure TFormMainForm.ShowComputerOff;
-begin
-  TrayIcon1.Visible := False;
-  Show;
-  WindowState := TWindowState.wsNormal;
-  Application.BringToFront;
-end;
-
-procedure TFormMainForm.StartClick(Sender: TObject);
-begin
-  if ((Start.Caption = 'S&uspend') or (Start.Caption = '&Hibernation') or
-    (Start.Caption = '&Turn Off'))
-  then
-  begin
-    ComputerOff;
-    Application.Terminate;
-  end
-  else
-  begin
-    if HasPrivateCmd then
-      FEndDateTime := IncHour(SysUtils.Now, hour + 3);
-
-    Stop.Enabled := true;
-    Options.Enabled := false;
-    case FormOptionsDialog.ComboBox1.ItemIndex of
-      0:
-        begin
-          WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-          Start.Caption := 'S&uspend';
-          Label1.Caption := 'Time to Suspend2Ram';
-        end;
-      1:
-        begin
-          WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-          Start.Caption := '&Hibernation';
-          Label1.Caption := 'Time to Hibernation';
-        end;
-      2:
-        begin
-          WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-          Start.Caption := '&Turn Off';
-          Label1.Caption := 'Time to Turn Off';
-        end;
-    end;
-    Timer1.Enabled := True;
-    ProgressBar1.Enabled := true;
-    ProgressBar1.Max := ((hour * 60 * 60) + (min * 60) + (sec));
-    ProgressBar1.Position := ((hour * 60 * 60) + (min * 60) + (sec));
-  end;
-end;
-
-procedure TFormMainForm.StopClick(Sender: TObject);
-begin
-  { Stop hide ComputerOff timer }
-  if Timer2.Interval = 2000 then
-    Timer2.Enabled := False;
-
-  ProgressBar1.Enabled := false;
-  ProgressBar1.Position := 0;
-  Stop.Enabled := false;
-  Options.Enabled := true;
-  FocusControl(Options);
-  Timer1.Enabled := False;
-  hour := 0; min := 0; sec := 0;
-  ShowTime;
-  case FormOptionsDialog.ComboBox1.ItemIndex of
-    0:
-      begin
-        WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-        Start.Caption := 'S&uspend';
-        Label1.Caption := 'Time to Suspend2Ram';
-      end;
-    1:
-      begin
-        WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-        Start.Caption := '&Hibernation';
-        Label1.Caption := 'Time to Hibernation';
-      end;
-    2:
-      begin
-        WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-        Start.Caption := '&Turn Off';
-        Label1.Caption := 'Time to Turn Off';
-      end;
-  end;
-end;
-
-procedure TFormMainForm.StopMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbRight then
-    OptionsClick(Sender);
-end;
-
-procedure TFormMainForm.ComputerOff;
-var
-  htoken: THandle;
-  ret, dw : Cardinal;
-  tp,tps : TOKEN_PRIVILEGES;
-
-begin
-  if OpenProcessToken(GetCurrentProcess(),
-    TOKEN_ADJUST_PRIVILEGES or TOKEN_QUERY, htoken)
-  then
-  begin
-    if LookupPrivilegeValue(nil, 'SeShutdownPrivilege',tp.Privileges[0].Luid) then
-    begin
-      tp.PrivilegeCount := 1;
-      tp.Privileges[0].Attributes := SE_PRIVILEGE_ENABLED;
-      dw := SizeOf(tp) ;
-      Windows.AdjustTokenPrivileges(htoken,false,tp,dw,tps,ret);
-      closehandle(htoken);
-    end;
-  end;
-
-  case WindowsTerminateType of
-    { Suspend }
-    0: SetSystemPowerState(true, false);
-    { Hibernate }
-    1: SetSystemPowerState(false, false);
-    2: ExitWindowsEx(EWX_POWEROFF or EWX_FORCE, 0);
-  end;
-end;
-
-procedure TFormMainForm.AbortComputerOff;
-var
-  ConfirmAction: string;
-  DialogResult: Integer;
-begin
-  { Remeber the current foreground window }
-  gForegroundWindow := GetForegroundWindow;
-  Application.BringToFront;
-
-  case FormOptionsDialog.ComboBox1.ItemIndex of
-    0: ConfirmAction := 'Suspend';
-    1: ConfirmAction := 'Hibernation';
-    2: ConfirmAction := 'Turn Off';
-  end;
-
-  ConfirmAction := Format('Abort %s that will occur in 2 minutes?', [ConfirmAction]);
-  DialogResult := MessageDlg(ConfirmAction, mtConfirmation, mbYesNo, 0, mbYes);
-
-  { Restore the previously recorded foreground window }
-  SetForegroundWindow(gForegroundWindow);
-
-  if DialogResult = mrYes then
-    Close;
-end;
-
-procedure TFormMainForm.CloseAbortComputerOffModal;
-var
-  ActiveWindow: HWND;
-  LWindowText: string;
-begin
-  ActiveWindow := GetActiveWindow;
-  { Získať názov okna }
-  LWindowText := MUGetWindowText(ActiveWindow);
-
-  { Send WM_CLOSE only if the Confirm modal is in the foreground }
-  if IsWindow(ActiveWindow) and (LWindowText = 'Confirm') then
-    SendMessage(ActiveWindow, WM_CLOSE, 0, 0);
-
-  FormMainForm.SendToBack;
-end;
-
-procedure TFormMainForm.PauseVideoBeforeOff;
-begin
-    { Pause the Skylink/YouTube video if it's in the foreground, it sends
-      the ctrl+alt+shift+p keyboard shortcut that is handled by
-      the Tampermonkey. }
-    ShellExecute(0, nil,
-      PChar('E:\autohotkey\os-global\Src\ComputerOff\PauseVideoAtSuspend.ahk'),
-      nil, nil, SW_HIDE);
-end;
-
-procedure TFormMainForm.Timer1Timer(Sender: TObject);
-begin
-  if (HasPrivateCmd
-    and (CompareDateTime(Now, FEndDateTime) = GreaterThanValue)) then
-  begin
-    Application.Terminate;
-    Timer1.Enabled := False;
-  end;
-
-  dec(sec);
-
-  if sec = -1 then
-  begin
-    sec := 59;
-    dec(min);
-  end;
-
-  if min = -1 then
-  begin
-    min := 59;
-    dec(hour);
-  end;
-
-  if hour = -1 then
-  begin
-    Timer1.Enabled := False;
-    ComputerOff;
-    Application.Terminate;
-  end;
-
-  ShowTime;
-  ProgressBar1.Position := ProgressBar1.Position - 1;
-
-  { Prepare for PauseVideoBeforeOff }
-  if (hour = 0) and (min = 0) and (sec = 10) then
-    CloseAbortComputerOffModal;
-
-  { Pause video 8 seconds before a suspend }
-  if (hour = 0) and (min = 0) and (sec = 8) then
-    PauseVideoBeforeOff;
-
-  { Show dialog that allows to abort off action 2m55s before, 5s after LG TV }
-  if (hour = 0) and (min = 2) and (sec = 55) then
-    AbortComputerOff;
-end;
-
-procedure TFormMainForm.Timer2Timer(Sender: TObject);
-var
-  IniFile: TIniFile;
-begin
-  { Application started }
-  if Timer2.Interval = 1 then
-  begin
-    IniFile := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
-    FormOptionsDialog.ComboBox1.ItemIndex := IniFile.ReadInteger('Main', 'Type', 0);
-    IniFile.Free;
-
-    case FormOptionsDialog.ComboBox1.ItemIndex of
-      0:
-        begin
-          WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-          Start.Caption := 'S&uspend';
-          Label1.Caption := 'Time to Suspend2Ram';
-        end;
-      1:
-        begin
-          WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-          Start.Caption := '&Hibernation';
-          Label1.Caption := 'Time to Hibernation';
-        end;
-      2:
-        begin
-          WindowsTerminateType := FormOptionsDialog.ComboBox1.ItemIndex;
-          Start.Caption := '&Turn Off';
-          Label1.Caption := 'Time to Turn Off';
-        end;
-    end;
-
-    if HasPrivateCmd then
-    begin
-      Timer2.Interval := 0;
-
-      hour := 2;
-      min := 0;
-      sec := 0;
-
-      Start.Caption := '&Start';
-      ShowTime;
-      Start.Click;
-    end
-    { To show Options dialog, I'm trying to avoid Options dialog shows below
-      the MainForm once out of ten. }
-    else
-      Timer2.Interval := 90;
-
-  end
-  else if Timer2.Interval = 90 then
-  begin
-    Timer2.Interval := 0;
-
-    { Show an Options dialog on the first run }
-    Options.Click;
-  end
-
-  { Lookup to ComputerOff application for 2s }
-  else if Timer2.Interval = 2000 then
-  begin
-    Timer2.Enabled := False;
-    { Don't hide if countdown isn't running }
-    if Timer1.Enabled then
-      HideComputerOff;
-  end;
-end;
-
-procedure TFormMainForm.TrayIcon1MouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  ShowComputerOff;
-end;
-
-function TFormMainForm.MUGetWindowText(const AHwnd: HWND): string;
-var
-  LWindowTextLength: Integer;
-  LWindowTextResult: Integer;
-begin
-  LWindowTextLength := GetWindowTextLength(AHwnd);
-  Inc(LWindowTextLength);
-  SetLength(Result, LWindowTextLength);
-  LWindowTextResult := GetWindowText(AHwnd, PChar(Result), Length(Result));
-  SetLength(Result, LWindowTextResult);
-end;
+{ Windows Messages }
 
 procedure TFormMainForm.WndProc(var Message: TMessage);
 begin
   with Message do
   begin
-    if Msg = RM_CoMain then
+    case Msg of
+      { Don't accidentally call ComputerOff the next day if PC was suspended prematurely
+        the previous night. }
+      WM_POWERBROADCAST: // See https://learn.microsoft.com/en-us/windows/win32/power/wm-powerbroadcast
+        if WParam = PBT_APMRESUMEAUTOMATIC then
+          HandleApmResume;
+    end; { case Msg of }
+
+    { Our User registered messages }
+    { Cannot be in the case statement because RM_CoMain is not a constant. }
+    if Msg = RmShowMainForm then
       case WParam of
-        IdM_Show:
-        begin
-          { Remeber the current foreground window }
-          gForegroundWindow := GetForegroundWindow;
-          ShowComputerOff;
-          { Hide after 2s }
-          Timer2.Interval := 2000;
-          Timer2.Enabled := True;
-        end;
+        MsgId_Show: ShowComputerOffFor2s;
       end;
   end; { with Message do }
 
   inherited;
 end;
 
+procedure TFormMainForm.ApplicationEventsMainMinimize(Sender: TObject);
+begin
+  HideComputerOff;
+end;
+
+procedure TFormMainForm.ApplicationMinimize(Sender: TObject);
+begin
+  { Restore the previously recorded foreground window }
+  RestorePreviousWindow;
+end;
+
+{ Timers }
+
+procedure TFormMainForm.TimerCommonTimer(Sender: TObject);
+begin
+  case TimerCommon.Interval of
+    cStartupOneShot: Startup;
+    cHideComputerOffAfter2s: HideComputerOffAfter2s;
+  end;
+end;
+
+// Never call SynchronizeCountDownTimer in this timer directly
+procedure TFormMainForm.TimerCountDownTimer(Sender: TObject);
+begin
+  HandleMissedTimeouts;
+
+  FCountDownTime := FCountDownTime.IncSecond(-1);
+  UpdateLabelCountDown;
+  CountDownBar.StepIt;
+
+  if SameTime(FCountDownTime.GetTime, ZeroDateTime.GetTime) then
+  begin
+    { Without this the countdown doesn't show 00:00, it quits at 00:01 }
+    Application.ProcessMessages;
+    ComputerOff
+  end
+  else
+    PreComputerOff;
+end;
+
+{ TApplication Events }
+
+procedure TFormMainForm.ApplicationActivate(Sender: TObject);
+begin
+  with TimerThrottleActivate do
+  begin
+    Enabled := False;
+    Enabled := True;
+  end;
+end;
+
+procedure TFormMainForm.TimerThrottleActivateTimer(Sender: TObject);
+begin
+  if (Application.ModalLevel > 0) or not FormMainForm.Visible or
+     (WindowState = wsMinimized)  or TrayIconMain.Visible
+  then
+    Exit;
+
+  UpdateLabelCountDown;
+  FocusAndCenterMouseOnActivate;
+
+  TimerThrottleActivate.Enabled := False;
+end;
+
+{ TForm Events }
+
+procedure TFormMainForm.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  { Nothing to do }
+  if Key <> Char(VK_ESCAPE) then
+    Exit;
+
+  { Quit if the ComputerOff timer is not running }
+  if TimerCountDown.Enabled then
+    SendToBack
+  else
+    QuitApplication;
+end;
+
+{ TControl Events }
+
+procedure TFormMainForm.AboutClick(Sender: TObject);
+begin
+  FormAbout.ShowModal;
+end;
+
+procedure TFormMainForm.ButtonComputerOffClick(Sender: TObject);
+begin
+  ComputerOff;
+end;
+
+procedure TFormMainForm.OptionsClick(Sender: TObject);
+begin
+  { Nothing to do, Options modal has been canceled }
+  if FormOptionsDialog.ShowModal <> mrOk then
+    Exit;
+
+  { Restore the previously recorded foreground window }
+  RestorePreviousWindow;
+
+  { Nothing to do, Options modal was submitted with zero countdown time (00:00) }
+  if IsZeroCountDownTime then
+    Exit;
+
+  StartCountDown;
+
+  { MainWindow may disappear after clicking OK }
+  HideComputerOff(False);
+end;
+
+procedure TFormMainForm.QuitClick(Sender: TObject);
+begin
+  QuitApplication;
+end;
+
+procedure TFormMainForm.StopClick(Sender: TObject);
+begin
+  { Stop the timer to hide the ComputerOff application }
+  if TimerCommon.Interval = cHideComputerOffAfter2s then
+    TimerCommon.Enabled := False;
+
+  CountDownBar.Enabled := False;
+  CountDownBar.Position := 0;
+  TimerCountDown.Enabled := False;
+  FCountDownTime.SetTime(0, 0, 0, 0);
+  UpdateLabelCountDown;
+  PrepareComputerOffType;
+
+  Stop.Enabled := False;
+  Options.Enabled := True;
+  CenterMouse(Options);
+end;
+
+procedure TFormMainForm.StopMouseUp(
+  Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+    OptionsClick(Sender);
+end;
+
+{ Tray Icon Events }
+
+procedure TFormMainForm.TrayIconMainMouseDown(
+  Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  ShowComputerOff(False);
+end;
+
+{ public }
+
+{ UI CountDown related }
+
+procedure TFormMainForm.PrepareComputerOffType;
+begin
+  FComputerOffType := FormOptionsDialog.ComputerOffType.ItemIndex;
+  FComputerOffTypeString := FComputerOffTypesHash.Items[FComputerOffType];
+
+  UpdateLabelComputerOff;
+  UpdateButtonComputerOff;
+end;
+
+{ private }
+
+{ Types }
+
+constructor TFormMainForm.TComputerOffTypeString.Create(
+  const AName: string; const ANameWithAccelerator: string);
+begin
+  Name := AName;
+  NameWithAccelerator := ANameWithAccelerator;
+end;
+
+{ Initialization }
+
+procedure TFormMainForm.InitComputerOffTypesHash;
+begin
+  FComputerOffTypesHash := TDictionary<Integer, TComputerOffTypeString>.Create;
+
+  with FComputerOffTypesHash do
+  begin
+    TryAdd(cSleep,     TComputerOffTypeString.Create('Sleep',     'Sl&eep'));
+    TryAdd(cHibernate, TComputerOffTypeString.Create('Hibernate', '&Hibernate'));
+    TryAdd(cShutdown,  TComputerOffTypeString.Create('Shutdown',  'Shu&tdown'));
+  end;
+end;
+
+{ Persitent Storage }
+
+procedure TFormMainForm.LoadIniFile;
+var
+  LIniFile: TIniFile;
+begin
+  { The ItemIndex default value is 0 (from designer) if this fails }
+  LIniFile := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
+  try
+    FormOptionsDialog.ComputerOffType.ItemIndex :=
+      LIniFile.ReadInteger('Main', 'Type', cSleep);
+  finally
+    LIniFile.Free;
+  end;
+
+  PrepareComputerOffType;
+  UpdateLabelComputerOff;
+  UpdateButtonComputerOff;
+end;
+
+procedure TFormMainForm.SaveIniFile;
+var
+  LIniFile: TIniFile;
+begin
+  { Don't update (save) ini file if invoked with -private argument }
+  if HasPrivateCmd then
+    Exit;
+
+  LIniFile := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
+  try
+    LIniFile.WriteInteger('Main', 'Type', FComputerOffType);
+  finally
+    LIniFile.Free;
+  end;
+end;
+
+{ Startup }
+
+procedure TFormMainForm.Startup;
+begin
+  TimerCommon.Interval := 0;
+
+  if HasPrivateCmd then
+    StartupPrivate
+  else
+    StartupNormal;
+end;
+
+procedure TFormMainForm.StartupNormal;
+begin
+  LoadIniFile;
+  Options.Click;
+end;
+
+procedure TFormMainForm.StartupPrivate;
+var
+  LHourOriginal: Integer;
+begin
+  { Always set to Sleep in 2 hours }
+  with FormOptionsDialog do
+  begin
+    ComputerOffType.ItemIndex := cSleep;
+    LHourOriginal := Hour.Value;
+    Hour.Value := 2;
+  end;
+
+  StartCountDown;
+
+  { Restore }
+  FormOptionsDialog.Hour.Value := LHourOriginal;
+end;
+
+{ CountDown }
+
+procedure TFormMainForm.HandleMissedTimeouts;
+var
+  LNow: TDateTime;
+begin
+  LNow := Now;
+
+  { Secured quit, eg. when PC was suspended at night and resumed the next day to avoid
+    accidentally calling ComputerOff function. }
+  if LNow > FComputerOffTimeout4h then
+    QuitApplication
+
+  { Secured ComputerOff, eg. if the process was paused or suspended (edge case) }
+  else if LNow > FComputerOffTimeout1s then
+    ComputerOff;
+end;
+
+{ OptionsClick }
+
+function TFormMainForm.IsZeroCountDownTime: Boolean;
+begin
+  { Nothing to do, no zero time }
+  with FormOptionsDialog do
+    if (Hour.Value <> 0) or (Minute.Value <> 0) or (Second.Value <> 0) then
+      Exit(False);
+
+  PrepareComputerOffType;
+  Result := True;
+end;
+
+{ UI CountDown related }
+
+procedure TFormMainForm.StartCountDown;
+begin
+  PepareAllCountDownControls;
+
+  Stop.Enabled := True;
+  Options.Enabled := False;
+  CountDownBar.Enabled := True;
+  TimerCountDown.Enabled := True;
+end;
+
+procedure TFormMainForm.UpdateLabelComputerOff;
+begin
+  LabelComputerOff.Caption := 'Time to ' + FComputerOffTypeString.Name;
+end;
+
+procedure TFormMainForm.UpdateButtonComputerOff;
+begin
+  ButtonComputerOff.Caption := FComputerOffTypeString.NameWithAccelerator;
+end;
+
+procedure TFormMainForm.PepareAllCountDownControls;
+begin
+  PepareCountDown;
+  PrepareCountDownBar;
+  PepareComputerOffTimeouts;
+
+  UpdateLabelCountDown;
+end;
+
+procedure TFormMainForm.PepareCountDown;
+begin
+  with FormOptionsDialog do
+    FCountDownTime.SetTime(Hour.Value, Minute.Value, Second.Value, 0);
+end;
+
+procedure TFormMainForm.PrepareCountDownBar;
+begin
+  CountDownBar.Max := ComputeCountDownBarMax;
+  CountDownBar.Position := ComputeCountDownBarPosition;
+end;
+
+procedure TFormMainForm.PepareComputerOffTimeouts;
+begin
+  { Store when to call the ComputerOff (used for edge cases and corrections}
+  FComputerOffTimeout := Now + FCountDownTime;
+
+  { Secured quit }
+  FComputerOffTimeout4h := FComputerOffTimeout.IncHour(cComputerOffTimeout4h);
+  { Secured ComputerOff }
+  FComputerOffTimeout1s := FComputerOffTimeout.IncSecond(cComputerOffTimeout1s);
+  { Secured Abort modal }
+  with cShowAbortModalTreshold do
+    FComputerOffTimeout_SecuredAbortModal :=
+      FComputerOffTimeout.IncSecond(((Minute * 60) + Second) * -1); // Negative to decrease
+end;
+
+procedure TFormMainForm.UpdateLabelCountDown;
+begin
+  LabelCountDown.Caption := TimeToStr(FCountDownTime.GetTime);
+end;
+
+function TFormMainForm.ComputeCountDownBarMax;
+begin
+  Result := ComputeCountDownBarPosition;
+end;
+
+function TFormMainForm.ComputeCountDownBarPosition;
+begin
+  Result := (FCountDownTime.Hour * 60 * 60) + (FCountDownTime.Minute * 60) +
+    (FCountDownTime.Second);
+end;
+
+function TFormMainForm.UpdateCountDownBarPosition;
+begin
+  Result := ComputeCountDownBarPosition;
+end;
+
+{ ComputerOff }
+
+procedure TFormMainForm.PreComputerOff;
+var
+  LIsMin0: Boolean;
+begin
+  { Nothing to do }
+  if FCountDownTime.Hour <> 0 then
+    Exit;
+
+  LIsMin0 := FCountDownTime.Minute = 0;
+
+  { Pause the video 8 seconds before changing the power state }
+  if LIsMin0 and (FCountDownTime.Second = cPauseVideoThreshold) then
+    PauseVideo
+
+  { Close the Abort ComputerOff modal dialog }
+  else if (FAbortModal <> nil) and FAbortModalShown and LIsMin0 and
+          (FCountDownTime.Second = cCloseAbortModalTreshold)
+  then
+    FAbortModal.Close // Sets mrCancel result (don't call FreeAndNil here)
+
+  { Show model dialog that allows to abort off action 2m55s before (5s after LG TV) }
+  else if (FCountDownTime.Minute = cShowAbortModalTreshold.Minute) and
+          (FCountDownTime.Second = cShowAbortModalTreshold.Second)
+  then
+    ShowAbortComputerOffModal;
+end;
+
+procedure TFormMainForm.PauseVideo;
+begin
+  { Pause the Skylink/YouTube video if it's in the foreground, it sends
+    the ctrl+alt+shift+p keyboard shortcut that is handled by
+    the Tampermonkey. }
+  ShellExecute(0, nil, PChar(cPauseVideoAhkFilepath), nil, nil, SW_HIDE);
+end;
+
+procedure TFormMainForm.ComputerOff;
+begin
+  { Nothing to do, already in the shutdown process invoked by another condition }
+  if FShuttingDown then
+    Exit;
+
+  FShuttingDown := True;
+
+  { Nothing to do, SeShutdownPrivilege was not enabled }
+  if not EnableSeShutdownPrivilege then
+    Exit;
+
+  InvokeComputerOff;
+  QuitApplication;
+end;
+
+function TFormMainForm.EnableSeShutdownPrivilege: Boolean;
+var
+  LNewState: TOKEN_PRIVILEGES;
+  LTokenHandle: THandle;
+  LResult: BOOL;
+begin
+  if not OpenProcessToken(GetCurrentProcess, TOKEN_ADJUST_PRIVILEGES, LTokenHandle) then
+    Exit(False);
+
+  if not LookupPrivilegeValue(nil, SE_SHUTDOWN_NAME, LNewState.Privileges[0].Luid) then
+    Exit(False);
+
+  LNewState.PrivilegeCount := 1;
+  LNewState.Privileges[0].Attributes := SE_PRIVILEGE_ENABLED;
+
+  LResult := AdjustTokenPrivileges(
+    LTokenHandle, False, LNewState, SizeOf(LNewState), nil, nil);
+
+  Result := LResult and (GetLastError = ERROR_SUCCESS);
+  CloseHandle(LTokenHandle);
+end;
+
+procedure TFormMainForm.InvokeComputerOff;
+const
+  LSHTDN_REASON_MAJOR_OTHER  = DWORD($00000000);
+  LSHTDN_REASON_MINOR_OTHER  = DWORD($00000000);
+  LSHTDN_REASON_FLAG_PLANNED = DWORD($80000000);
+  LcSHTDNPlanned =
+    LSHTDN_REASON_MAJOR_OTHER or LSHTDN_REASON_MINOR_OTHER or LSHTDN_REASON_FLAG_PLANNED;
+begin
+  case FComputerOffType of
+{$ifdef DEBUG}
+    cSleep:     Winapi.Windows.Beep(2300, 120);
+    cHibernate: Winapi.Windows.Beep(5300, 120);
+    cShutdown:  Winapi.Windows.Beep(8300, 120);
+{$ELSE}
+    cSleep:     SetSuspendState(False, False, True); // Suspend2Ram
+    cHibernate: SetSuspendState(True,  False, True); // Hibernate
+    cShutdown:  ExitWindowsEx(EWX_POWEROFF or EWX_FORCE, LcSHTDNPlanned); // Don't use EWX_FORCEIFHUNG
+{$ENDIF}
+  end;
+end;
+
+{ Abort Modal }
+
+procedure TFormMainForm.ShowAbortComputerOffModal;
+var
+  LModalResult: Integer;
+begin
+  { Remember the current foreground window }
+  FhForegroundWindow := GetForegroundWindow;
+  ShowComputerOff;
+
+  FAbortModal := CreateMessageDialog(GetAbortModalMessage, mtConfirmation, mbYesNo);
+
+  with FAbortModal do
+  begin
+    Position := poScreenCenter;
+    OnShow := FormShowCenterMouse;
+    LModalResult := ShowModal;
+  end;
+
+  { Restore the previously recorded foreground window }
+  RestorePreviousWindow;
+
+  if LModalResult = mrYes then
+    QuitApplication
+  else
+    HideComputerOff(False);
+
+  FreeAbortModal;
+end;
+
+function TFormMainForm.GetAbortModalMessage: string;
+var
+  LAbortTime: string;
+begin
+  with cShowAbortModalTreshold do
+    LAbortTime := EncodeTime(0, Minute, Second, 0).Format('n"m"s"s"'); // Time format eg.: 2m55s
+
+  Result := Format(cAbortModalMessage, [FComputerOffTypeString.Name, LAbortTime]);
+end;
+
+procedure TFormMainForm.FreeAbortModal;
+begin
+  FAbortModalShown := False;
+  FreeAndNil(FAbortModal);
+end;
+
+{ Show/Hide/Quit }
+
+procedure TFormMainForm.ShowComputerOff(ARememberForegroundWindow: Boolean);
+begin
+  { Remember the current foreground window }
+  if ARememberForegroundWindow then
+    FhForegroundWindow := GetForegroundWindow
+  else
+    FhForegroundWindow := 0;
+
+  TrayIconMain.Visible := False;
+  Show;
+  WindowState := wsNormal;
+  Application.ProcessMessages;
+  Application.BringToFront;
+end;
+
+procedure TFormMainForm.HideComputerOff(ARestorePreviousWindow: Boolean);
+begin
+  Hide;
+  WindowState := wsMinimized;
+  TrayIconMain.Visible := True;
+
+  { Restore the previously recorded foreground window }
+  if ARestorePreviousWindow then
+    RestorePreviousWindow;
+end;
+
+procedure TFormMainForm.FocusAndCenterMouseOnActivate;
+begin
+  { CanFocus checks are inside the CenterMouse }
+  if TimerCountDown.Enabled then
+    CenterMouse(Stop)
+  else
+    CenterMouse(Options);
+end;
+
+procedure TFormMainForm.RestorePreviousWindow;
+begin
+  { Restore the previously recorded foreground window }
+  if FhForegroundWindow <> 0 then
+    SetForegroundWindow(FhForegroundWindow);
+end;
+
+procedure TFormMainForm.QuitApplication;
+begin
+  Close;
+
+  TimerCountDown.Enabled := False;
+  TimerCommon.Enabled := False;
+end;
+
+{ Windows Messages actions }
+
+procedure TFormMainForm.ShowComputerOffFor2s;
+begin
+  { Remember the current foreground window and cursor position }
+  FhForegroundWindow := GetForegroundWindow;
+  GetCursorPos(FCursorPosition);
+
+  ShowComputerOff;
+
+  { Hide after 2s }
+  TimerCommon.Interval := cHideComputerOffAfter2s;
+  TimerCommon.Enabled := True;
+end;
+
+procedure TFormMainForm.HideComputerOffAfter2s;
+begin
+  TimerCommon.Enabled := False;
+
+  { Don't hide if the countdown is not running or any modal is open }
+  if not TimerCountDown.Enabled or (Application.ModalLevel > 0) then
+    Exit;
+
+  HideComputerOff;
+
+  { Restore cursor position }
+  with FCursorPosition do
+    SetCursorPos(X, Y);
+end;
+
+procedure TFormMainForm.HandleApmResume;
+begin
+  SynchronizeCountDownTimer;
+  QuitOrShowAbortModal;
+end;
+
+procedure TFormMainForm.SynchronizeCountDownTimer;
+begin
+  { Nothing to do, the countdown counter was stopped before suspending }
+  if not TimerCountDown.Enabled then
+    Exit;
+
+  { I don't need to save the suspend time, subtracting the actual countdown value
+    from Now will always be correct. }
+  FCountDownTime := Now - FComputerOffTimeout;
+  UpdateCountDownBarPosition;
+end;
+
+procedure TFormMainForm.QuitOrShowAbortModal;
+var
+  LNow: TDateTime;
+begin
+  LNow := Now;
+
+  { Exact time when the ComputerOff function should be invoked has been missed/passed }
+  if LNow >= FComputerOffTimeout then
+    QuitApplication
+
+  { Exact time was not missed, there is still a time to show the Abort modal }
+  else if LNow > FComputerOffTimeout_SecuredAbortModal then
+    ShowAbortComputerOffModal;
+end;
+
+{ TForm Events }
+
+procedure TFormMainForm.FormShowCenterMouse(Sender: TObject);
+begin
+  FAbortModalShown := True;
+  CenterMouse((Sender as TForm).ActiveControl, False);
+end;
+
 end.
+

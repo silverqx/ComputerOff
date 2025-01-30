@@ -1,48 +1,56 @@
 object FormAbout: TFormAbout
+  AlignWithMargins = True
   Left = 416
   Top = 325
   Margins.Left = 4
   Margins.Top = 4
   Margins.Right = 4
   Margins.Bottom = 4
+  AutoSize = True
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'O programe ComputerOff'
-  ClientHeight = 199
-  ClientWidth = 325
+  ClientHeight = 224
+  ClientWidth = 407
   Color = clBtnFace
+  DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -14
+  Font.Height = -19
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
+  Padding.Left = 10
+  Padding.Top = 10
+  Padding.Right = 10
+  Padding.Bottom = 6
   Position = poScreenCenter
   OnKeyPress = FormKeyPress
-  PixelsPerInch = 120
-  TextHeight = 17
-  object Panel1: TPanel
+  OnShow = FormShow
+  PixelsPerInch = 128
+  TextHeight = 23
+  object PanelMain: TPanel
     Left = 10
     Top = 10
-    Width = 301
-    Height = 141
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
-    BevelInner = bvRaised
-    BevelKind = bkTile
-    BevelOuter = bvLowered
-    TabOrder = 0
+    Width = 387
+    Height = 160
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    BevelKind = bkFlat
+    BevelOuter = bvNone
+    TabOrder = 2
+    StyleElements = [seFont, seClient]
     object ProgramIcon: TImage
-      Left = 20
-      Top = 16
+      Left = 24
+      Top = 19
       Width = 60
       Height = 77
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
       AutoSize = True
       Picture.Data = {
         0954506E67496D61676589504E470D0A1A0A0000000D494844520000003C0000
@@ -187,89 +195,90 @@ object FormAbout: TFormAbout
       IsControl = True
     end
     object ProductName: TLabel
-      Left = 108
-      Top = 9
-      Width = 124
-      Height = 25
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+      Left = 134
+      Top = 14
+      Width = 187
+      Height = 30
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
       Caption = 'ComputerOff'
       Color = clBtnFace
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -20
-      Font.Name = 'MS Sans Serif'
+      Font.Height = -26
+      Font.Name = 'DejaVu Sans'
       Font.Style = [fsBold]
       ParentColor = False
       ParentFont = False
       IsControl = True
     end
     object Version: TLabel
-      Left = 111
-      Top = 34
-      Width = 71
-      Height = 17
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
-      Caption = 'verzia 1.3.3'
+      Left = 134
+      Top = 54
+      Width = 51
+      Height = 23
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = 'v2.0.0'
       IsControl = True
     end
-    object Label1: TLabel
-      Left = 111
-      Top = 58
-      Width = 140
-      Height = 19
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+    object Author: TLabel
+      Left = 134
+      Top = 86
+      Width = 164
+      Height = 23
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
       Caption = 'by Silver Zachara'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -16
+      Font.Height = -19
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Label2: TLabel
-      Left = 111
-      Top = 88
-      Width = 46
-      Height = 17
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
-      Caption = 'MailTo :'
-    end
-    object Label3: TLabel
-      Left = 111
-      Top = 108
-      Width = 156
-      Height = 17
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
-      Caption = 'silver.zachara@gmail.com'
-    end
   end
-  object OKButton: TButton
-    Left = 218
-    Top = 159
-    Width = 93
-    Height = 31
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
-    Caption = 'OK'
+  object OK: TButton
+    Left = 286
+    Top = 181
+    Width = 111
+    Height = 38
+    Margins.Left = 5
+    Margins.Top = 6
+    Margins.Right = 0
+    Margins.Bottom = 5
+    Caption = '&OK'
     Default = True
     ModalResult = 1
+    TabOrder = 0
+  end
+  object EmailLink: TLinkLabel
+    AlignWithMargins = True
+    Left = 146
+    Top = 129
+    Width = 236
+    Height = 28
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Caption = 
+      '<a href="mailto:silver.zachara@gmail.com">silver.zachara@gmail.c' +
+      'om</a>'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -20
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 1
+    TabStop = True
+    OnLinkClick = EmailLinkLinkClick
   end
 end

@@ -3,28 +3,56 @@ program ComputerOff;
 {$IFOPT D-}{$WEAKLINKRTTI ON}{$ENDIF}
 {$RTTI EXPLICIT METHODS([]) PROPERTIES([]) FIELDS([])}
 
-{$SetPEFlags 1}
-
 uses
-  Vcl.Forms,
   Winapi.Windows,
-  UnitAbout in 'UnitAbout.pas' {FormAbout},
-  UnitMainForm in 'UnitMainForm.pas' {FormMainForm},
-  UnitOptionsDialog in 'UnitOptionsDialog.pas' {FormOptionsDialog},
+  Vcl.Forms,
   Vcl.Themes,
   Vcl.Styles,
-  System.SysUtils;
+  System.SysUtils,
+  UnitConstants     in 'UnitConstants.pas',
+  UnitCommon        in 'UnitCommon.pas',
+  UnitAbout         in 'UnitAbout.pas',         // FormAbout
+  UnitMainForm      in 'UnitMainForm.pas',      // FormMainForm
+  UnitOptionsDialog in 'UnitOptionsDialog.pas'; // FormOptionsDialog
 
 {$R *.res}
 
 const
-  Co_App_Title = 'ComputerOff';
-  Co_Mx_One_Instance = 'Global\' + Co_App_Title + 'App';
-  MSG_CoShow = 'MSG_CoShow';
-  Ec_Already_Running = 1;
+  ApplicationTitle = 'ComputerOff';
+  MxOneInstance    = 'Global\' + ApplicationTitle + 'App';
+  MsgShowMainForm  = 'MSG_CoShowMainForm';
+  EcAlreadyRunning = 1;
 
 var
-  hMutex: THandle;
+  hMxOneInstance: THandle;
+
+{ Parse ComputerOff command-line arguments }
+procedure ParseCommandLine;
+begin
+  if FindCmdLineSwitch('private') then
+    HasPrivateCmd := True;
+end;
+
+{ Only one instance can be running }
+procedure OneInstance;
+begin
+  if GetLastError <> ERROR_ALREADY_EXISTS then
+    Exit;
+
+  { Restore from the tray icon }
+  PostMessage(HWND_BROADCAST, RmShowMainForm, MsgId_Show, 0);
+  ExitProcess(EcAlreadyRunning);
+end;
+
+{ Show minimized to tray icon (hidden) with the -private argument }
+procedure ShowMinized;
+begin
+  if not HasPrivateCmd then
+    Exit;
+
+  Application.ShowMainForm := False;
+  Winapi.Windows.Beep(3300, 120);
+end;
 
 begin
 {$IFDEF DEBUG}
@@ -33,37 +61,27 @@ begin
 {$WARN SYMBOL_PLATFORM ON}
 {$ENDIF}
 
-  if FindCmdLineSwitch('private') then
-    HasPrivateCmd := True;
+  ParseCommandLine;
+  RmShowMainForm := RegisterWindowMessage(MsgShowMainForm);
 
-  RM_CoMain := RegisterWindowMessage(MSG_CoShow);
-
-  hMutex := CreateMutex(nil, False, PChar(Co_Mx_One_Instance));
+  hMxOneInstance := CreateMutex(nil, False, PChar(MxOneInstance));
   try
-    { Only one instance can be running. }
-    if GetLastError = ERROR_ALREADY_EXISTS then
-    begin
-      { Restore from the tray icon }
-      PostMessage(HWND_BROADCAST, RM_CoMain, IdM_Show, 0);
-      ExitProcess(Ec_Already_Running);
-    end;
+    { Only one instance can be running }
+    OneInstance;
+
+    TStyleManager.TrySetStyle('Windows10 SlateGray');
 
     Application.Initialize;
     Application.MainFormOnTaskbar := True;
-//    TStyleManager.TrySetStyle('Windows10 Dark');
-    TStyleManager.TrySetStyle('Windows10 SlateGray');
-    Application.Title := Co_App_Title;
+    Application.Title := 'ComputerOff';
     Application.CreateForm(TFormMainForm, FormMainForm);
     Application.CreateForm(TFormOptionsDialog, FormOptionsDialog);
     Application.CreateForm(TFormAbout, FormAbout);
-    { Show minimized to tray icon (hidden) }
-    if HasPrivateCmd then
-    begin
-      Application.ShowMainForm := False;
-      Winapi.Windows.Beep(3300, 120);
-    end;
+
+    { Show minimized to tray icon (hidden) with the -private argument }
+    ShowMinized;
     Application.Run;
   finally
-    CloseHandle(hMutex);
+    CloseHandle(hMxOneInstance);
   end;
 end.

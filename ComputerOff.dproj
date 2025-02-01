@@ -70,7 +70,7 @@
         <VerInfo_Keys>CompanyName=Crystal Studio;FileDescription=Countdown for suspending PC;FileVersion=2.0.0.0;InternalName=$(MSBuildProjectName);LegalCopyright=Copyright (©) 2025 Silver Zachara;LegalTrademarks=;OriginalFilename=$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.0.0.0;Comments=</VerInfo_Keys>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
-        <DCC_UnitSearchPath>.\$(Platform)\$(Config);$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>.\src;.\$(Platform)\$(Config);$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <Custom_Styles>&quot;Windows10 SlateGray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10SlateGray.vsf&quot;</Custom_Styles>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
     </PropertyGroup>
@@ -154,11 +154,11 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="UnitConstants.pas"/>
-        <DCCReference Include="UnitCommon.pas"/>
-        <DCCReference Include="UnitAbout.pas"/>
-        <DCCReference Include="UnitMainForm.pas"/>
-        <DCCReference Include="UnitOptionsDialog.pas"/>
+        <DCCReference Include="src\UnitConstants.pas"/>
+        <DCCReference Include="src\UnitCommon.pas"/>
+        <DCCReference Include="src\UnitAbout.pas"/>
+        <DCCReference Include="src\UnitMainForm.pas"/>
+        <DCCReference Include="src\UnitOptionsDialog.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

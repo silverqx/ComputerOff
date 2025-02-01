@@ -9,11 +9,11 @@ uses
   Vcl.Themes,
   Vcl.Styles,
   System.SysUtils,
-  UnitConstants     in 'UnitConstants.pas',
-  UnitCommon        in 'UnitCommon.pas',
-  UnitAbout         in 'UnitAbout.pas',         // FormAbout
-  UnitMainForm      in 'UnitMainForm.pas',      // FormMainForm
-  UnitOptionsDialog in 'UnitOptionsDialog.pas'; // FormOptionsDialog
+  UnitConstants     in 'src\UnitConstants.pas',
+  UnitCommon        in 'src\UnitCommon.pas',
+  UnitAbout         in 'src\UnitAbout.pas',         // FormAbout
+  UnitMainForm      in 'src\UnitMainForm.pas',      // FormMainForm
+  UnitOptionsDialog in 'src\UnitOptionsDialog.pas'; // FormOptionsDialog
 
 {$R *.res}
 

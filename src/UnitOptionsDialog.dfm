@@ -10,7 +10,7 @@ object FormOptionsDialog: TFormOptionsDialog
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Options'
-  ClientHeight = 287
+  ClientHeight = 288
   ClientWidth = 360
   Color = clBtnFace
   DoubleBuffered = True

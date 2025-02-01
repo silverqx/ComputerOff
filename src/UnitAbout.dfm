@@ -224,7 +224,7 @@ object FormAbout: TFormAbout
       Margins.Top = 5
       Margins.Right = 5
       Margins.Bottom = 5
-      Caption = 'v2.0.0'
+      Caption = 'v2.0.1'
       IsControl = True
     end
     object Author: TLabel

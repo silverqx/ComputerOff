@@ -111,9 +111,8 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
-        <VerInfo_Keys>CompanyName=Crystal Studio;FileDescription=Countdown for suspending PC;FileVersion=2.0.0.8;InternalName=$(MSBuildProjectName);LegalCopyright=Copyright (©) 2025 Silver Zachara;LegalTrademarks=;OriginalFilename=$(MSBuildProjectName);ProgramID=com.crystal.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Crystal Studio;FileDescription=Countdown for suspending PC;FileVersion=2.0.1.0;InternalName=$(MSBuildProjectName);LegalCopyright=Copyright (©) 2025 Silver Zachara;LegalTrademarks=;OriginalFilename=$(MSBuildProjectName);ProgramID=com.crystal.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.0.1;Comments=</VerInfo_Keys>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <VerInfo_Release>0</VerInfo_Release>
         <PostBuildEvent><![CDATA[copy /B "$(OUTPUTPATH)" C:\optx64\ComputerOff\$(OUTPUTFILENAME)
 $(PostBuildEvent)]]></PostBuildEvent>
         <Debugger_RunParams>-private</Debugger_RunParams>
@@ -122,7 +121,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <VerInfo_MinorVer>0</VerInfo_MinorVer>
         <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Build>8</VerInfo_Build>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -142,12 +140,13 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <VerInfo_Keys>CompanyName=Crystal Studio;FileDescription=Countdown for suspending PC;FileVersion=2.0.0.0;InternalName=$(MSBuildProjectName);LegalCopyright=Copyright (©) 2025 Silver Zachara;LegalTrademarks=;OriginalFilename=$(MSBuildProjectName);ProgramID=com.crystal.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Crystal Studio;FileDescription=Countdown for suspending PC;FileVersion=2.0.1.0;InternalName=$(MSBuildProjectName);LegalCopyright=Copyright (©) 2025 Silver Zachara;LegalTrademarks=;OriginalFilename=$(MSBuildProjectName);ProgramID=com.crystal.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.0.1;Comments=</VerInfo_Keys>
         <Debugger_HostApplication>C:\Users\Silver Zachara\Documents\Embarcadero\Studio\Projects\ComputerOff\ComputerOff.exe</Debugger_HostApplication>
         <VerInfo_Debug>true</VerInfo_Debug>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

@@ -43,8 +43,8 @@ object FormAbout: TFormAbout
     TabOrder = 2
     StyleElements = [seFont, seClient]
     object ProgramIcon: TImage
-      Left = 24
-      Top = 19
+      Left = 33
+      Top = 21
       Width = 60
       Height = 77
       Margins.Left = 5
@@ -191,6 +191,7 @@ object FormAbout: TFormAbout
         8E9792CF09092DC17C5F7762EC737A3C0C92177EC7203450702FD1540943280C
         923352C1A4D5FF620A2709A6CDC9D0CD145153B2F25AA93AF12F3DEE76A2C0F8
         1AFB0000000049454E44AE426082}
+      Proportional = True
       Transparent = True
       IsControl = True
     end

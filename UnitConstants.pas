@@ -4,8 +4,8 @@ interface
 
 uses System.SysUtils;
 
-{ PreComputerOff }
 type
+  { PreComputerOff }
   TShowAbortModalTreshold = record
     Minute: Word;
     Second: Word;

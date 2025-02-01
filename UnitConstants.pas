@@ -11,7 +11,16 @@ type
     Second: Word;
   end;
 
+  { StartupPrivate }
+  TTimeoutAtForPrivateCmd = record
+    Hour: Word;
+    Minute: Word;
+  end;
+
 const
+  { StartupPrivate }
+  cTimeoutAtForPrivateCmd: TTimeoutAtForPrivateCmd = (Hour: 2; Minute: 0);
+
   { TimerCommonTimer }
   cStartupOneShot         = Cardinal(1);
   cHideComputerOffAfter2s = Cardinal(2000);

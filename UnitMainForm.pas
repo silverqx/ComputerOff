@@ -488,20 +488,23 @@ end;
 
 procedure TFormMainForm.StartupPrivate;
 var
-  LHourOriginal: Integer;
+  LTimeoutAtOriginal: TTimeoutAtForPrivateCmd;
 begin
   { Always set to Sleep in 2 hours }
   with FormOptionsDialog do
   begin
     ComputerOffType.ItemIndex := cSleep;
-    LHourOriginal := Hour.Value;
-    Hour.Value := 2;
+    LTimeoutAtOriginal.Hour := Hour.Value;
+    LTimeoutAtOriginal.Minute := Minute.Value;
+    Hour.Value := cTimeoutAtForPrivateCmd.Hour;
+    Minute.Value := cTimeoutAtForPrivateCmd.Minute;
   end;
 
   StartCountDown;
 
-  { Restore }
-  FormOptionsDialog.Hour.Value := LHourOriginal;
+  { Restore, so the value will be set only during the startup with -private argument }
+  FormOptionsDialog.Hour.Value := LTimeoutAtOriginal.Hour;
+  FormOptionsDialog.Minute.Value := LTimeoutAtOriginal.Minute;
 end;
 
 { CountDown }

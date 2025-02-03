@@ -6,7 +6,7 @@ object FormMainForm: TFormMainForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'ComputerOff'
-  ClientHeight = 174
+  ClientHeight = 173
   ClientWidth = 464
   Color = clBtnFace
   DoubleBuffered = True

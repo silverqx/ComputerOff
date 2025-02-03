@@ -84,11 +84,11 @@ type
     FComputerOffTimeout4h: TDateTime;
     { Secured ComputerOff }
     FComputerOffTimeout1s: TDateTime;
-    { Secured Abort modal }
-    FComputerOffTimeout_SecuredAbortModal: TDateTime;
+    { Secured Restart/Abort modal }
+    FComputerOffTimeout_SecuredRestartAbortModal: TDateTime;
 
-    FAbortModal: TForm;
-    FAbortModalShown: Boolean;
+    FRestartAbortModal: TForm;
+    FRestartAbortModalShown: Boolean;
 
     FhForegroundWindow: HWND;
     FCursorPosition: TPoint;
@@ -142,10 +142,10 @@ type
     function EnableSeShutdownPrivilege: Boolean;
     procedure InvokeComputerOff;
 
-    { Abort Modal }
-    procedure ShowAbortComputerOffModal;
-    function GetAbortModalMessage: string;
-    procedure FreeAbortModal;
+    { Restart/Abort modal }
+    procedure ShowRestartAbortModal;
+    function GetRestartAbortModalMessage: string;
+    procedure FreeRestartAbortModal;
 
     { Show/Hide/Quit }
     procedure ShowComputerOff(ARememberForegroundWindow: Boolean = True);
@@ -161,7 +161,7 @@ type
 
     procedure HandleApmResume; inline;
     procedure SynchronizeCountDownTimer;
-    procedure QuitOrShowAbortModal;
+    procedure QuitOrShowRestartAbortModal;
 
     { TForm Events }
     procedure FormShowCenterMouse(Sender: TObject);
@@ -541,7 +541,7 @@ end;
 
 procedure TFormMainForm.RestartCountDown;
 begin
-  { Putting this here to avoid a weird logic in the ShowAbortComputerOffModal }
+  { Putting this here to avoid a weird logic in the ShowRestartAbortModal }
   HideComputerOff(False);
 
   ResetCountDown;
@@ -628,9 +628,9 @@ begin
   FComputerOffTimeout4h := FComputerOffTimeout.IncHour(cComputerOffTimeout4h);
   { Secured ComputerOff }
   FComputerOffTimeout1s := FComputerOffTimeout.IncSecond(cComputerOffTimeout1s);
-  { Secured Abort modal }
-  with cShowAbortModalTreshold do
-    FComputerOffTimeout_SecuredAbortModal :=
+  { Secured Restart/Abort modal }
+  with cShowRestartAbortModalTreshold do
+    FComputerOffTimeout_SecuredRestartAbortModal :=
       FComputerOffTimeout.IncSecond(((Minute * 60) + Second) * -1); // Negative to decrease
 end;
 
@@ -672,17 +672,18 @@ begin
   if LIsMin0 and (FCountDownTime.Second = cPauseVideoThreshold) then
     PauseVideo
 
-  { Close the Abort ComputerOff modal dialog }
-  else if (FAbortModal <> nil) and FAbortModalShown and LIsMin0 and
-          (FCountDownTime.Second = cCloseAbortModalTreshold)
+  { Close the Restart/Abort modal dialog }
+  else if (FRestartAbortModal <> nil) and FRestartAbortModalShown and LIsMin0 and
+          (FCountDownTime.Second = cCloseRestartAbortModalTreshold)
   then
-    FAbortModal.Close // Sets mrCancel result (don't call FreeAndNil here)
+    FRestartAbortModal.Close // Sets mrCancel result (don't call FreeAndNil here)
 
-  { Show model dialog that allows to abort off action 2m55s before (5s after LG TV) }
-  else if (FCountDownTime.Minute = cShowAbortModalTreshold.Minute) and
-          (FCountDownTime.Second = cShowAbortModalTreshold.Second)
+  { Show model dialog that allows to Restart or Abort the current countdown
+    2m55s before ComputerOff action (5s after LG TV). }
+  else if (FCountDownTime.Minute = cShowRestartAbortModalTreshold.Minute) and
+          (FCountDownTime.Second = cShowRestartAbortModalTreshold.Second)
   then
-    ShowAbortComputerOffModal;
+    ShowRestartAbortModal;
 end;
 
 procedure TFormMainForm.PauseVideo;
@@ -752,9 +753,9 @@ begin
   end;
 end;
 
-{ Abort Modal }
+{ Restart/Abort modal }
 
-procedure TFormMainForm.ShowAbortComputerOffModal;
+procedure TFormMainForm.ShowRestartAbortModal;
 const
   mbRetryAbortCancel = [mbRetry, mbAbort, mbCancel];
 var
@@ -764,11 +765,11 @@ begin
   FhForegroundWindow := GetForegroundWindow;
   ShowComputerOff;
 
-  FAbortModal :=
-    CreateMessageDialog(GetAbortModalMessage, mtConfirmation, mbRetryAbortCancel,
+  FRestartAbortModal :=
+    CreateMessageDialog(GetRestartAbortModalMessage, mtConfirmation, mbRetryAbortCancel,
       mbRetry, ['&Cancel', '&Quit', '&Restart']);
 
-  with FAbortModal do
+  with FRestartAbortModal do
   begin
     Caption := 'Choice';
     Position := poScreenCenter;
@@ -776,7 +777,7 @@ begin
     LModalResult := ShowModal;
   end;
 
-  FreeAbortModal;
+  FreeRestartAbortModal;
   { Restore the previously recorded foreground window }
   RestorePreviousWindow;
 
@@ -788,20 +789,21 @@ begin
   end;
 end;
 
-function TFormMainForm.GetAbortModalMessage: string;
+function TFormMainForm.GetRestartAbortModalMessage: string;
 var
-  LAbortTime: string;
+  LTresholdTime: string;
 begin
-  with cShowAbortModalTreshold do
-    LAbortTime := EncodeTime(0, Minute, Second, 0).Format('n"m"s"s"'); // Time format eg.: 2m55s
+  with cShowRestartAbortModalTreshold do
+    LTresholdTime := EncodeTime(0, Minute, Second, 0).Format('n"m"s"s"'); // Time format eg.: 2m55s
 
-  Result := Format(cAbortModalMessage, [FComputerOffTypeString.Name, LAbortTime]);
+  Result :=
+    Format(cRestartAbortModalMessage, [FComputerOffTypeString.Name, LTresholdTime]);
 end;
 
-procedure TFormMainForm.FreeAbortModal;
+procedure TFormMainForm.FreeRestartAbortModal;
 begin
-  FAbortModalShown := False;
-  FreeAndNil(FAbortModal);
+  FRestartAbortModalShown := False;
+  FreeAndNil(FRestartAbortModal);
 end;
 
 { Show/Hide/Quit }
@@ -889,7 +891,7 @@ end;
 procedure TFormMainForm.HandleApmResume;
 begin
   SynchronizeCountDownTimer;
-  QuitOrShowAbortModal;
+  QuitOrShowRestartAbortModal;
 end;
 
 procedure TFormMainForm.SynchronizeCountDownTimer;
@@ -904,7 +906,7 @@ begin
   UpdateCountDownBarPosition;
 end;
 
-procedure TFormMainForm.QuitOrShowAbortModal;
+procedure TFormMainForm.QuitOrShowRestartAbortModal;
 var
   LNow: TDateTime;
 begin
@@ -914,16 +916,16 @@ begin
   if LNow >= FComputerOffTimeout then
     QuitApplication
 
-  { Exact time was not missed, there is still a time to show the Abort modal }
-  else if LNow > FComputerOffTimeout_SecuredAbortModal then
-    ShowAbortComputerOffModal;
+  { Exact time was not missed, there is still a time to show the Restart/Abort modal }
+  else if LNow > FComputerOffTimeout_SecuredRestartAbortModal then
+    ShowRestartAbortModal;
 end;
 
 { TForm Events }
 
 procedure TFormMainForm.FormShowCenterMouse(Sender: TObject);
 begin
-  FAbortModalShown := True;
+  FRestartAbortModalShown := True;
   CenterMouse((Sender as TForm).ActiveControl, False);
 end;
 

@@ -727,6 +727,7 @@ begin
 
   with FAbortModal do
   begin
+    Caption := 'Choice';
     Position := poScreenCenter;
     OnShow := FormShowCenterMouse;
     LModalResult := ShowModal;

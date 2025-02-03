@@ -788,13 +788,15 @@ end;
 
 function TFormMainForm.CreateRestartAbortModal: TForm;
 const
-  mbRetryAbortCancel = [mbRetry, mbAbort, mbCancel];
+  mbRestart = mbRetry;
+  mbQuit    = mbAbort;
+  mbRestartQuitCancel = [mbRestart, mbQuit, mbCancel];
 begin
   { I'll assign it directly here even though this isn't good coding practice because
     there's no need to reuse this method. This allows me to call ShowModal directly
     on the return value. }
   FRestartAbortModal :=
-    CreateMessageDialog(GetRestartAbortModalMessage, mtConfirmation, mbRetryAbortCancel,
+    CreateMessageDialog(GetRestartAbortModalMessage, mtConfirmation, mbRestartQuitCancel,
       mbRetry, ['&Cancel', '&Quit', '&Restart']);
 
   with FRestartAbortModal do

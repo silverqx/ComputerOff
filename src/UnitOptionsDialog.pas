@@ -61,21 +61,21 @@ procedure TFormOptionsDialog.FormShow(Sender: TObject);
 begin
   FocusControl(Minute);
 
-  { Center the mouse cursor in the given control }
+  // Center the mouse cursor in the given control
   CenterMouse(OK, False);
 end;
 
 procedure TFormOptionsDialog.FormKeyPress(Sender: TObject; var Key: Char);
 begin
-  { TComboBox uses Enter and Esc during opened drop-down list }
+  // TComboBox uses Enter and Esc during opened drop-down list
   if (ActiveControl = ComputerOffType) and FComputerOffTypeOpened then
     Exit;
 
-  { Enter }
+  // Enter
   if Key = Char(VK_RETURN) then
     ModalResult := mrOk
 
-  { Esc }
+  // Esc
   else if Key = Char(VK_ESCAPE) then
     ModalResult := mrCancel;
 end;
@@ -87,11 +87,11 @@ var
 begin
   LIsLeftButton := Button = mbLeft;
 
-  { Don't handle left mouse clicks on TButton-s }
+  // Don't handle left mouse clicks on TButton-s
   if LIsLeftButton and (Sender is TButton) then
     Exit;
 
-  { Focus the next/previous control on right/left mouse clicks }
+  // Focus the next/previous control on right/left mouse clicks
   if LIsLeftButton or (Button = mbMiddle) then
     SelectNext(ActiveControl, False, True)
 
@@ -106,7 +106,7 @@ var
 begin
   LSpinEdit := FindSpinEdit(MousePos);
 
-  { Nothing to do }
+  // Nothing to do
   if LSpinEdit = nil then
     Exit;
 
@@ -123,7 +123,7 @@ var
 begin
   LSpinEdit := FindSpinEdit(MousePos);
 
-  { Nothing to do }
+  // Nothing to do
   if LSpinEdit = nil then
     Exit;
 
@@ -158,7 +158,7 @@ begin
         Value := 0; // Don't user 30 here, 0 disables looping over
     end
 
-    { Stop incrementing at 23:30:xx }
+    // Stop incrementing at 23:30:xx
     else if (Hour.Value = 23) and (Value > 59) then
       Value := 30
 
@@ -190,7 +190,7 @@ end;
 
 procedure TFormOptionsDialog.ComputerOffTypeChange(Sender: TObject);
 begin
-  { Update it immediately }
+  // Update it immediately
   FormMainForm.PrepareComputerOffType;
 end;
 
@@ -207,7 +207,7 @@ end;
 
 procedure TFormOptionsDialog.ComputerOffTypeCloseUp(Sender: TObject);
 begin
-  { Timer is needed to keep/extend the open dropdown state long enough }
+  // Timer is needed to keep/extend the open dropdown state long enough
   TimerComboBoxDropDown.Enabled := True;
 end;
 
@@ -220,7 +220,7 @@ var
 begin
   Result := nil;
 
-  { Try to find a control under the cursor }
+  // Try to find a control under the cursor
   LWindow := WindowFromPoint(AMousePosition);
   if LWindow = 0 then
     Exit;
@@ -229,14 +229,14 @@ begin
   if LWinControl = nil then
     Exit;
 
-  { TSpinEdit found }
+  // TSpinEdit found
   if LWinControl is TSpinEdit then
     Exit(LWinControl as TSpinEdit);
 
   if LWinControl.Parent is TSpinEdit then
     Exit(LWinControl.Parent as TSpinEdit);
 
-  { If TSpinEdit has a focus take it }
+  // If TSpinEdit has a focus take it
   if ActiveControl is TSpinEdit then
     Exit(ActiveControl as TSpinEdit);
 end;

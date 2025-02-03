@@ -202,7 +202,7 @@ function SetSuspendState(Hibernate, Force, WakeupEventsDisabled: ByteBool): Byte
 
 procedure TFormMainForm.FormCreate(Sender: TObject);
 begin
-  { Remember the current foreground window }
+  // Remember the current foreground window
   FhForegroundWindow := GetForegroundWindow;
 
   InitComputerOffTypesHash;
@@ -240,15 +240,15 @@ begin
       WM_POWERBROADCAST: // See https://learn.microsoft.com/en-us/windows/win32/power/wm-powerbroadcast
         if WParam = PBT_APMRESUMEAUTOMATIC then
           HandleApmResume;
-    end; { case Msg of }
+    end; // case Msg of
 
     { Our User registered messages }
-    { Cannot be in the case statement because RM_CoMain is not a constant. }
+    // Cannot be in the case statement because RM_CoMain is not a constant.
     if Msg = RmShowMainForm then
       case WParam of
         MsgId_Show: ShowComputerOffFor2s;
       end;
-  end; { with Message do }
+  end; // with Message do
 
   inherited;
 end;
@@ -260,7 +260,7 @@ end;
 
 procedure TFormMainForm.ApplicationMinimize(Sender: TObject);
 begin
-  { Restore the previously recorded foreground window }
+  // Restore the previously recorded foreground window
   RestorePreviousWindow;
 end;
 
@@ -285,7 +285,7 @@ begin
 
   if SameTime(FCountDownTime.GetTime, ZeroDateTime.GetTime) then
   begin
-    { Without this the countdown doesn't show 00:00, it quits at 00:01 }
+    // Without this the countdown doesn't show 00:00, it quits at 00:01
     Application.ProcessMessages;
     ComputerOff
   end
@@ -321,11 +321,11 @@ end;
 
 procedure TFormMainForm.FormKeyPress(Sender: TObject; var Key: Char);
 begin
-  { Nothing to do }
+  // Nothing to do
   if Key <> Char(VK_ESCAPE) then
     Exit;
 
-  { Quit if the ComputerOff timer is not running }
+  // Quit if the ComputerOff timer is not running
   if TimerCountDown.Enabled then
     SendToBack
   else
@@ -346,20 +346,20 @@ end;
 
 procedure TFormMainForm.OptionsClick(Sender: TObject);
 begin
-  { Nothing to do, Options modal has been canceled }
+  // Nothing to do, Options modal has been canceled
   if FormOptionsDialog.ShowModal <> mrOk then
     Exit;
 
-  { Restore the previously recorded foreground window }
+  // Restore the previously recorded foreground window
   RestorePreviousWindow;
 
-  { Nothing to do, Options modal was submitted with zero countdown time (00:00) }
+  // Nothing to do, Options modal was submitted with zero countdown time (00:00)
   if IsZeroCountDownTime then
     Exit;
 
   StartCountDown;
 
-  { MainWindow may disappear after clicking OK }
+  // MainWindow may disappear after clicking OK
   HideComputerOff(False);
 end;
 
@@ -370,7 +370,7 @@ end;
 
 procedure TFormMainForm.StopClick(Sender: TObject);
 begin
-  { Stop the timer to hide the ComputerOff application }
+  // Stop the timer to hide the ComputerOff application
   if TimerCommon.Interval = cHideComputerOffAfter2s then
     TimerCommon.Enabled := False;
 
@@ -437,7 +437,7 @@ procedure TFormMainForm.LoadIniFile;
 var
   LIniFile: TIniFile;
 begin
-  { The ItemIndex default value is 0 (from designer) if this fails }
+  // The ItemIndex default value is 0 (from designer) if this fails
   LIniFile := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
   try
     FormOptionsDialog.ComputerOffType.ItemIndex :=
@@ -455,7 +455,7 @@ procedure TFormMainForm.SaveIniFile;
 var
   LIniFile: TIniFile;
 begin
-  { Don't update (save) ini file if invoked with -private argument }
+  // Don't update (save) ini file if invoked with -private argument
   if HasPrivateCmd then
     Exit;
 
@@ -489,7 +489,7 @@ procedure TFormMainForm.StartupPrivate;
 var
   LTimeoutAtOriginal: TTimeoutAtForPrivateCmd;
 begin
-  { Always set to Sleep in 2 hours }
+  // Always set to Sleep in 2 hours
   with FormOptionsDialog do
   begin
     ComputerOffType.ItemIndex := cSleep;
@@ -501,7 +501,7 @@ begin
 
   StartCountDown;
 
-  { Restore, so the value will be set only during the startup with -private argument }
+  // Restore, so the value will be set only during the startup with -private argument
   FormOptionsDialog.Hour.Value := LTimeoutAtOriginal.Hour;
   FormOptionsDialog.Minute.Value := LTimeoutAtOriginal.Minute;
 end;
@@ -519,7 +519,7 @@ begin
   if LNow > FComputerOffTimeout4h then
     QuitApplication
 
-  { Secured ComputerOff, eg. if the process was paused or suspended (edge case) }
+  // Secured ComputerOff, eg. if the process was paused or suspended (edge case)
   else if LNow > FComputerOffTimeout1s then
     ComputerOff;
 end;
@@ -528,7 +528,7 @@ end;
 
 function TFormMainForm.IsZeroCountDownTime: Boolean;
 begin
-  { Nothing to do, no zero time }
+  // Nothing to do, no zero time
   with FormOptionsDialog do
     if (Hour.Value <> 0) or (Minute.Value <> 0) or (Second.Value <> 0) then
       Exit(False);
@@ -541,7 +541,7 @@ end;
 
 procedure TFormMainForm.RestartCountDown;
 begin
-  { Putting this here to avoid a weird logic in the ShowRestartAbortModal }
+  // Putting this here to avoid a weird logic in the ShowRestartAbortModal
   HideComputerOff(False);
 
   ResetCountDown;
@@ -609,7 +609,7 @@ begin
   with FormOptionsDialog do
     FCountDownTime.SetTime(Hour.Value, Minute.Value, Second.Value, 0);
 
-  { Backup the initial countdown value (used by CountDownBar to re-/compute max. value) }
+  // Backup the initial countdown value (used by CountDownBar to re-/compute max. value)
   FCountDownTimeInitial := FCountDownTime;
 end;
 
@@ -624,11 +624,11 @@ begin
   { Store when to call the ComputerOff (used for edge cases and corrections}
   FComputerOffTimeout := Now + FCountDownTime;
 
-  { Secured quit }
+  // Secured quit
   FComputerOffTimeout4h := FComputerOffTimeout.IncHour(cComputerOffTimeout4h);
-  { Secured ComputerOff }
+  // Secured ComputerOff
   FComputerOffTimeout1s := FComputerOffTimeout.IncSecond(cComputerOffTimeout1s);
-  { Secured Restart/Abort modal }
+  // Secured Restart/Abort modal
   with cShowRestartAbortModalTreshold do
     FComputerOffTimeout_SecuredRestartAbortModal :=
       FComputerOffTimeout.IncSecond(((Minute * 60) + Second) * -1); // Negative to decrease
@@ -662,17 +662,17 @@ procedure TFormMainForm.PreComputerOff;
 var
   LIsMin0: Boolean;
 begin
-  { Nothing to do }
+  // Nothing to do
   if FCountDownTime.Hour <> 0 then
     Exit;
 
   LIsMin0 := FCountDownTime.Minute = 0;
 
-  { Pause the video 8 seconds before changing the power state }
+  // Pause the video 8 seconds before changing the power state
   if LIsMin0 and (FCountDownTime.Second = cPauseVideoThreshold) then
     PauseVideo
 
-  { Close the Restart/Abort modal dialog }
+  // Close the Restart/Abort modal dialog
   else if (FRestartAbortModal <> nil) and FRestartAbortModalShown and LIsMin0 and
           (FCountDownTime.Second = cCloseRestartAbortModalTreshold)
   then
@@ -696,13 +696,13 @@ end;
 
 procedure TFormMainForm.ComputerOff;
 begin
-  { Nothing to do, already in the shutdown process invoked by another condition }
+  // Nothing to do, already in the shutdown process invoked by another condition
   if FShuttingDown then
     Exit;
 
   FShuttingDown := True;
 
-  { Nothing to do, SeShutdownPrivilege was not enabled }
+  // Nothing to do, SeShutdownPrivilege was not enabled
   if not EnableSeShutdownPrivilege then
     Exit;
 
@@ -761,7 +761,7 @@ const
 var
   LModalResult: Integer;
 begin
-  { Remember the current foreground window }
+  // Remember the current foreground window
   FhForegroundWindow := GetForegroundWindow;
   ShowComputerOff;
 
@@ -778,7 +778,7 @@ begin
   end;
 
   FreeRestartAbortModal;
-  { Restore the previously recorded foreground window }
+  // Restore the previously recorded foreground window
   RestorePreviousWindow;
 
   case LModalResult of
@@ -810,7 +810,7 @@ end;
 
 procedure TFormMainForm.ShowComputerOff(ARememberForegroundWindow: Boolean);
 begin
-  { Remember the current foreground window }
+  // Remember the current foreground window
   if ARememberForegroundWindow then
     FhForegroundWindow := GetForegroundWindow
   else
@@ -829,14 +829,14 @@ begin
   WindowState := wsMinimized;
   TrayIconMain.Visible := True;
 
-  { Restore the previously recorded foreground window }
+  // Restore the previously recorded foreground window
   if ARestorePreviousWindow then
     RestorePreviousWindow;
 end;
 
 procedure TFormMainForm.FocusAndCenterMouseOnActivate;
 begin
-  { CanFocus checks are inside the CenterMouse }
+  // CanFocus checks are inside the CenterMouse
   if TimerCountDown.Enabled then
     CenterMouse(Stop)
   else
@@ -845,7 +845,7 @@ end;
 
 procedure TFormMainForm.RestorePreviousWindow;
 begin
-  { Restore the previously recorded foreground window }
+  // Restore the previously recorded foreground window
   if FhForegroundWindow <> 0 then
     SetForegroundWindow(FhForegroundWindow);
 end;
@@ -862,13 +862,13 @@ end;
 
 procedure TFormMainForm.ShowComputerOffFor2s;
 begin
-  { Remember the current foreground window and cursor position }
+  // Remember the current foreground window and cursor position
   FhForegroundWindow := GetForegroundWindow;
   GetCursorPos(FCursorPosition);
 
   ShowComputerOff;
 
-  { Hide after 2s }
+  // Hide after 2s
   TimerCommon.Interval := cHideComputerOffAfter2s;
   TimerCommon.Enabled := True;
 end;
@@ -877,13 +877,13 @@ procedure TFormMainForm.HideComputerOffAfter2s;
 begin
   TimerCommon.Enabled := False;
 
-  { Don't hide if the countdown is not running or any modal is open }
+  // Don't hide if the countdown is not running or any modal is open
   if not TimerCountDown.Enabled or (Application.ModalLevel > 0) then
     Exit;
 
   HideComputerOff;
 
-  { Restore cursor position }
+  // Restore cursor position
   with FCursorPosition do
     SetCursorPos(X, Y);
 end;
@@ -896,7 +896,7 @@ end;
 
 procedure TFormMainForm.SynchronizeCountDownTimer;
 begin
-  { Nothing to do, the countdown counter was stopped before suspending }
+  // Nothing to do, the countdown counter was stopped before suspending
   if not TimerCountDown.Enabled then
     Exit;
 
@@ -912,11 +912,11 @@ var
 begin
   LNow := Now;
 
-  { Exact time when the ComputerOff function should be invoked has been missed/passed }
+  // Exact time when the ComputerOff function should be invoked has been missed/passed
   if LNow >= FComputerOffTimeout then
     QuitApplication
 
-  { Exact time was not missed, there is still a time to show the Restart/Abort modal }
+  // Exact time was not missed, there is still a time to show the Restart/Abort modal
   else if LNow > FComputerOffTimeout_SecuredRestartAbortModal then
     ShowRestartAbortModal;
 end;

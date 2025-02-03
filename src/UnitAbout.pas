@@ -41,7 +41,7 @@ end;
 
 procedure TFormAbout.FormKeyPress(Sender: TObject; var Key: Char);
 begin
-  { Esc }
+  // Esc
   if Key = Char(VK_ESCAPE) then
     ModalResult := mrOk;
 end;

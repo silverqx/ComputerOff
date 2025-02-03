@@ -144,6 +144,9 @@ type
 
     { Restart/Abort modal }
     procedure ShowRestartAbortModal;
+    procedure HandleRestartAbortModalResult(AModalResult: Integer);
+
+    function CreateRestartAbortModal: TForm;
     function GetRestartAbortModalMessage: string;
     procedure FreeRestartAbortModal;
 
@@ -757,8 +760,6 @@ end;
 { Restart/Abort modal }
 
 procedure TFormMainForm.ShowRestartAbortModal;
-const
-  mbRetryAbortCancel = [mbRetry, mbAbort, mbCancel];
 var
   LModalResult: Integer;
 begin
@@ -766,6 +767,32 @@ begin
   FhForegroundWindow := GetForegroundWindow;
   ShowComputerOff;
 
+  LModalResult := CreateRestartAbortModal.ShowModal;
+  FreeRestartAbortModal;
+
+  // Restore the previously recorded foreground window
+  RestorePreviousWindow;
+
+  HandleRestartAbortModalResult(LModalResult);
+end;
+
+procedure TFormMainForm.HandleRestartAbortModalResult(AModalResult: Integer);
+begin
+  case AModalResult of
+    mrRetry: RestartCountDown;
+    mrAbort: QuitApplication;
+  else
+    HideComputerOff(False);
+  end;
+end;
+
+function TFormMainForm.CreateRestartAbortModal: TForm;
+const
+  mbRetryAbortCancel = [mbRetry, mbAbort, mbCancel];
+begin
+  { I'll assign it directly here even though this isn't good coding practice because
+    there's no need to reuse this method. This allows me to call ShowModal directly
+    on the return value. }
   FRestartAbortModal :=
     CreateMessageDialog(GetRestartAbortModalMessage, mtConfirmation, mbRetryAbortCancel,
       mbRetry, ['&Cancel', '&Quit', '&Restart']);
@@ -775,19 +802,9 @@ begin
     Caption := 'Choice';
     Position := poScreenCenter;
     OnShow := FormShowCenterMouse;
-    LModalResult := ShowModal;
   end;
 
-  FreeRestartAbortModal;
-  // Restore the previously recorded foreground window
-  RestorePreviousWindow;
-
-  case LModalResult of
-    mrRetry: RestartCountDown;
-    mrAbort: QuitApplication;
-  else
-    HideComputerOff(False);
-  end;
+  Result := FRestartAbortModal;
 end;
 
 function TFormMainForm.GetRestartAbortModalMessage: string;

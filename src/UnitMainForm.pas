@@ -648,7 +648,7 @@ end;
 function TFormMainForm.ComputeCountDownBarPosition;
 begin
   Result := (FCountDownTime.Hour * 60 * 60) + (FCountDownTime.Minute * 60) +
-    (FCountDownTime.Second);
+    FCountDownTime.Second;
 end;
 
 procedure TFormMainForm.UpdateCountDownBarPosition;

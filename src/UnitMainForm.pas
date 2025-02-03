@@ -242,7 +242,7 @@ begin
           HandleApmResume;
     end; // case Msg of
 
-    { Our User registered messages }
+    { User/Our registered messages }
     // Cannot be in the case statement because RM_CoMain is not a constant
     if Msg = RmShowMainForm then
       case WParam of

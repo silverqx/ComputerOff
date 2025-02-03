@@ -243,7 +243,7 @@ begin
     end; // case Msg of
 
     { Our User registered messages }
-    // Cannot be in the case statement because RM_CoMain is not a constant.
+    // Cannot be in the case statement because RM_CoMain is not a constant
     if Msg = RmShowMainForm then
       case WParam of
         MsgId_Show: ShowComputerOffFor2s;

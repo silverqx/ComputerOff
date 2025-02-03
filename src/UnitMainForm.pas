@@ -112,6 +112,8 @@ type
     function IsZeroCountDownTime: Boolean;
 
     { UI CountDown related }
+    procedure RestartCountDown;
+    procedure ResetCountDown;
     procedure StartCountDown;
 
     procedure UpdateLabelComputerOff;
@@ -367,15 +369,7 @@ begin
   if TimerCommon.Interval = cHideComputerOffAfter2s then
     TimerCommon.Enabled := False;
 
-  CountDownBar.Enabled := False;
-  CountDownBar.Position := 0;
-  TimerCountDown.Enabled := False;
-  FCountDownTime.SetTime(0, 0, 0, 0);
-  UpdateLabelCountDown;
-  PrepareComputerOffType;
-
-  Stop.Enabled := False;
-  Options.Enabled := True;
+  ResetCountDown;
   CenterMouse(Options);
 end;
 
@@ -539,6 +533,30 @@ begin
 end;
 
 { UI CountDown related }
+
+procedure TFormMainForm.RestartCountDown;
+begin
+  { Putting this here to avoid a weird logic in the ShowAbortComputerOffModal }
+  HideComputerOff(False);
+
+  ResetCountDown;
+  StartCountDown;
+end;
+
+procedure TFormMainForm.ResetCountDown;
+begin
+  Stop.Enabled := False;
+
+  CountDownBar.Enabled := False;
+  CountDownBar.Position := 0;
+  TimerCountDown.Enabled := False;
+  FCountDownTime.SetTime(0, 0, 0, 0);
+
+  UpdateLabelCountDown;
+  PrepareComputerOffType;
+
+  Options.Enabled := True;
+end;
 
 procedure TFormMainForm.StartCountDown;
 begin
@@ -716,6 +734,8 @@ end;
 { Abort Modal }
 
 procedure TFormMainForm.ShowAbortComputerOffModal;
+const
+  mbRetryAbortCancel = [mbRetry, mbAbort, mbCancel];
 var
   LModalResult: Integer;
 begin
@@ -723,7 +743,9 @@ begin
   FhForegroundWindow := GetForegroundWindow;
   ShowComputerOff;
 
-  FAbortModal := CreateMessageDialog(GetAbortModalMessage, mtConfirmation, mbYesNo);
+  FAbortModal :=
+    CreateMessageDialog(GetAbortModalMessage, mtConfirmation, mbRetryAbortCancel,
+      mbRetry, ['&Cancel', '&Quit', '&Restart']);
 
   with FAbortModal do
   begin
@@ -737,10 +759,12 @@ begin
   { Restore the previously recorded foreground window }
   RestorePreviousWindow;
 
-  if LModalResult = mrYes then
-    QuitApplication
+  case LModalResult of
+    mrRetry: RestartCountDown;
+    mrAbort: QuitApplication;
   else
     HideComputerOff(False);
+  end;
 end;
 
 function TFormMainForm.GetAbortModalMessage: string;

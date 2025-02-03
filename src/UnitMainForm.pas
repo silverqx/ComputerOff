@@ -274,9 +274,10 @@ begin
   end;
 end;
 
-// Never call SynchronizeCountDownTimer in this timer directly
 procedure TFormMainForm.TimerCountDownTimer(Sender: TObject);
 begin
+  // Never call the SynchronizeCountDownTimer inside this timer directly
+
   HandleMissedTimeouts;
 
   FCountDownTime := FCountDownTime.IncSecond(-1);

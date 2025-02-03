@@ -732,6 +732,7 @@ begin
     LModalResult := ShowModal;
   end;
 
+  FreeAbortModal;
   { Restore the previously recorded foreground window }
   RestorePreviousWindow;
 
@@ -739,8 +740,6 @@ begin
     QuitApplication
   else
     HideComputerOff(False);
-
-  FreeAbortModal;
 end;
 
 function TFormMainForm.GetAbortModalMessage: string;

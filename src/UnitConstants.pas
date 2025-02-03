@@ -6,7 +6,7 @@ uses System.SysUtils;
 
 type
   { PreComputerOff }
-  TShowRestartAbortModalTreshold = record
+  TShowRestartAbortModalThreshold = record
     Minute: Word;
     Second: Word;
   end;
@@ -33,17 +33,17 @@ const
   cHibernate = Integer(1);
   cShutdown  = Integer(2);
 
-  { PepareComputerOffTimeouts }
+  { PrepareComputerOffTimeouts }
   { Secured quit }
   cComputerOffTimeout4h = Int64(4);
   { Secured ComputerOff }
   cComputerOffTimeout1s = Int64(1);
 
   { PreComputerOff }
-  cPauseVideoThreshold             = Word(8);
-  cCloseRestartAbortModalTreshold  = Word(10);
-  cShowRestartAbortModalTreshold:
-    TShowRestartAbortModalTreshold = (Minute: 2; Second: 55);
+  cPauseVideoThreshold              = Word(8);
+  cCloseRestartAbortModalThreshold  = Word(10);
+  cShowRestartAbortModalThreshold:
+    TShowRestartAbortModalThreshold = (Minute: 2; Second: 55);
 
   { PauseVideo }
   cPauseVideoAhkFilepath = 'E:\autohotkey\os-global\Src\ComputerOff\PauseVideo.ahk';

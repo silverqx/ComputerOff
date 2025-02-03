@@ -8,7 +8,7 @@ uses
 
 type
   TFormOptionsDialog = class(TForm)
-    PanellMain: TPanel;
+    PanelMain: TPanel;
     Cancel: TButton;
     ComputerOffType: TComboBox;
     Hour: TSpinEdit;

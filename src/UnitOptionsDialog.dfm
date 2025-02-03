@@ -32,7 +32,7 @@ object FormOptionsDialog: TFormOptionsDialog
   OnShow = FormShow
   PixelsPerInch = 128
   TextHeight = 28
-  object PanellMain: TPanel
+  object PanelMain: TPanel
     AlignWithMargins = True
     Left = 10
     Top = 10

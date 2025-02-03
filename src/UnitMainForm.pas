@@ -97,7 +97,7 @@ type
     { Initialization }
     procedure InitComputerOffTypesHash;
 
-    { Persitent Storage }
+    { Persistent Storage }
     procedure LoadIniFile;
     procedure SaveIniFile;
 
@@ -124,10 +124,10 @@ type
     procedure UpdateLabelComputerOff;
     procedure UpdateButtonComputerOff; inline;
 
-    procedure PepareAllCountDownControls;
-    procedure PepareCountDown;
+    procedure PrepareAllCountDownControls;
+    procedure PrepareCountDown;
     procedure PrepareCountDownBar; inline;
-    procedure PepareComputerOffTimeouts;
+    procedure PrepareComputerOffTimeouts;
     procedure UpdateLabelCountDown;
 
     function ComputeCountDownBarMax: Integer;
@@ -432,7 +432,7 @@ begin
   end;
 end;
 
-{ Persitent Storage }
+{ Persistent Storage }
 
 procedure TFormMainForm.LoadIniFile;
 var
@@ -578,7 +578,7 @@ end;
 
 procedure TFormMainForm.StartCountDown;
 begin
-  PepareAllCountDownControls;
+  PrepareAllCountDownControls;
 
   Stop.Enabled := True;
   Options.Enabled := False;
@@ -596,16 +596,16 @@ begin
   ButtonComputerOff.Caption := FComputerOffTypeString.NameWithAccelerator;
 end;
 
-procedure TFormMainForm.PepareAllCountDownControls;
+procedure TFormMainForm.PrepareAllCountDownControls;
 begin
-  PepareCountDown;
+  PrepareCountDown;
   PrepareCountDownBar;
-  PepareComputerOffTimeouts;
+  PrepareComputerOffTimeouts;
 
   UpdateLabelCountDown;
 end;
 
-procedure TFormMainForm.PepareCountDown;
+procedure TFormMainForm.PrepareCountDown;
 begin
   with FormOptionsDialog do
     FCountDownTime.SetTime(Hour.Value, Minute.Value, Second.Value, 0);
@@ -620,7 +620,7 @@ begin
   CountDownBar.Position := ComputeCountDownBarPosition;
 end;
 
-procedure TFormMainForm.PepareComputerOffTimeouts;
+procedure TFormMainForm.PrepareComputerOffTimeouts;
 begin
   { Store when to call the ComputerOff (used for edge cases and corrections}
   FComputerOffTimeout := Now + FCountDownTime;
@@ -630,7 +630,7 @@ begin
   // Secured ComputerOff
   FComputerOffTimeout1s := FComputerOffTimeout.IncSecond(cComputerOffTimeout1s);
   // Secured Restart/Abort modal
-  with cShowRestartAbortModalTreshold do
+  with cShowRestartAbortModalThreshold do
     FComputerOffTimeout_SecuredRestartAbortModal :=
       FComputerOffTimeout.IncSecond(((Minute * 60) + Second) * -1); // Negative to decrease
 end;
@@ -675,14 +675,14 @@ begin
 
   // Close the Restart/Abort modal dialog
   else if (FRestartAbortModal <> nil) and FRestartAbortModalShown and LIsMin0 and
-          (FCountDownTime.Second = cCloseRestartAbortModalTreshold)
+          (FCountDownTime.Second = cCloseRestartAbortModalThreshold)
   then
     FRestartAbortModal.Close // Sets mrCancel result (don't call FreeAndNil here)
 
   { Show model dialog that allows to Restart or Abort the current countdown
     2m55s before ComputerOff action (5s after LG TV). }
-  else if (FCountDownTime.Minute = cShowRestartAbortModalTreshold.Minute) and
-          (FCountDownTime.Second = cShowRestartAbortModalTreshold.Second)
+  else if (FCountDownTime.Minute = cShowRestartAbortModalThreshold.Minute) and
+          (FCountDownTime.Second = cShowRestartAbortModalThreshold.Second)
   then
     ShowRestartAbortModal;
 end;
@@ -792,13 +792,13 @@ end;
 
 function TFormMainForm.GetRestartAbortModalMessage: string;
 var
-  LTresholdTime: string;
+  LThresholdTime: string;
 begin
-  with cShowRestartAbortModalTreshold do
-    LTresholdTime := EncodeTime(0, Minute, Second, 0).Format('n"m"s"s"'); // Time format eg.: 2m55s
+  with cShowRestartAbortModalThreshold do
+    LThresholdTime := EncodeTime(0, Minute, Second, 0).Format('n"m"s"s"'); // Time format eg.: 2m55s
 
   Result :=
-    Format(cRestartAbortModalMessage, [FComputerOffTypeString.Name, LTresholdTime]);
+    Format(cRestartAbortModalMessage, [FComputerOffTypeString.Name, LThresholdTime]);
 end;
 
 procedure TFormMainForm.FreeRestartAbortModal;

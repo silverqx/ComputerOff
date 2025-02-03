@@ -103,7 +103,7 @@ type
 
     { Startup }
     procedure Startup;
-    procedure StartupNormal;
+    procedure StartupNormal; inline;
     procedure StartupPrivate;
 
     { CountDown }
@@ -122,15 +122,15 @@ type
     procedure StartCountDown;
 
     procedure UpdateLabelComputerOff;
-    procedure UpdateButtonComputerOff;
+    procedure UpdateButtonComputerOff; inline;
 
     procedure PepareAllCountDownControls;
     procedure PepareCountDown;
-    procedure PrepareCountDownBar;
+    procedure PrepareCountDownBar; inline;
     procedure PepareComputerOffTimeouts;
     procedure UpdateLabelCountDown;
 
-    function ComputeCountDownBarMax: Integer; inline;
+    function ComputeCountDownBarMax: Integer;
     function ComputeCountDownBarPosition: Integer;
     procedure UpdateCountDownBarPosition; inline;
 

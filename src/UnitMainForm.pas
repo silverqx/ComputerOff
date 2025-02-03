@@ -72,6 +72,7 @@ type
 
   strict private
     FCountDownTime: TDateTime;
+    FCountDownTimeInitial: TDateTime;
     FShuttingDown: Boolean;
 
     FComputerOffType: Integer;
@@ -113,7 +114,11 @@ type
 
     { UI CountDown related }
     procedure RestartCountDown;
+
     procedure ResetCountDown;
+    procedure ResetCountDownTime;
+    procedure ResetCountDownBar; inline;
+
     procedure StartCountDown;
 
     procedure UpdateLabelComputerOff;
@@ -546,16 +551,28 @@ end;
 procedure TFormMainForm.ResetCountDown;
 begin
   Stop.Enabled := False;
-
-  CountDownBar.Enabled := False;
-  CountDownBar.Position := 0;
   TimerCountDown.Enabled := False;
-  FCountDownTime.SetTime(0, 0, 0, 0);
 
-  UpdateLabelCountDown;
-  PrepareComputerOffType;
+  ResetCountDownTime;
+  ResetCountDownBar;
 
   Options.Enabled := True;
+end;
+
+procedure TFormMainForm.ResetCountDownTime;
+begin
+  FCountDownTime.SetTime(0, 0, 0, 0);
+  UpdateLabelCountDown;
+end;
+
+procedure TFormMainForm.ResetCountDownBar;
+begin
+  with CountDownBar do
+  begin
+    Enabled := False;
+    Position := 0;
+    Max := 100;
+  end;
 end;
 
 procedure TFormMainForm.StartCountDown;
@@ -591,6 +608,9 @@ procedure TFormMainForm.PepareCountDown;
 begin
   with FormOptionsDialog do
     FCountDownTime.SetTime(Hour.Value, Minute.Value, Second.Value, 0);
+
+  { Backup the initial countdown value (used by CountDownBar to re-/compute max. value) }
+  FCountDownTimeInitial := FCountDownTime;
 end;
 
 procedure TFormMainForm.PrepareCountDownBar;
@@ -621,7 +641,8 @@ end;
 
 function TFormMainForm.ComputeCountDownBarMax;
 begin
-  Result := ComputeCountDownBarPosition;
+  Result := (FCountDownTimeInitial.Hour * 60 * 60) + (FCountDownTimeInitial.Minute * 60) +
+    FCountDownTimeInitial.Second;
 end;
 
 function TFormMainForm.ComputeCountDownBarPosition;

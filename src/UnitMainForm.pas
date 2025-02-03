@@ -127,7 +127,7 @@ type
 
     function ComputeCountDownBarMax: Integer; inline;
     function ComputeCountDownBarPosition: Integer;
-    function UpdateCountDownBarPosition: Integer; inline;
+    procedure UpdateCountDownBarPosition; inline;
 
     { ComputerOff }
     procedure PreComputerOff;
@@ -630,9 +630,9 @@ begin
     (FCountDownTime.Second);
 end;
 
-function TFormMainForm.UpdateCountDownBarPosition;
+procedure TFormMainForm.UpdateCountDownBarPosition;
 begin
-  Result := ComputeCountDownBarPosition;
+  CountDownBar.Position := ComputeCountDownBarPosition;
 end;
 
 { ComputerOff }

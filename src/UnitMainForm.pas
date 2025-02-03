@@ -144,15 +144,15 @@ type
 
     { Restart/Abort modal }
     procedure ShowRestartAbortModal;
-    procedure HandleRestartAbortModalResult(AModalResult: Integer);
+    procedure HandleRestartAbortModalResult(const AModalResult: Integer);
 
     function CreateRestartAbortModal: TForm;
     function GetRestartAbortModalMessage: string;
     procedure FreeRestartAbortModal;
 
     { Show/Hide/Quit }
-    procedure ShowComputerOff(ARememberForegroundWindow: Boolean = True);
-    procedure HideComputerOff(ARestorePreviousWindow: Boolean = True);
+    procedure ShowComputerOff(const ARememberForegroundWindow: Boolean = True);
+    procedure HideComputerOff(const ARestorePreviousWindow: Boolean = True);
     procedure FocusAndCenterMouseOnActivate;
     procedure RestorePreviousWindow;
 
@@ -776,7 +776,7 @@ begin
   HandleRestartAbortModalResult(LModalResult);
 end;
 
-procedure TFormMainForm.HandleRestartAbortModalResult(AModalResult: Integer);
+procedure TFormMainForm.HandleRestartAbortModalResult(const AModalResult: Integer);
 begin
   case AModalResult of
     mrRetry: RestartCountDown;
@@ -828,7 +828,7 @@ end;
 
 { Show/Hide/Quit }
 
-procedure TFormMainForm.ShowComputerOff(ARememberForegroundWindow: Boolean);
+procedure TFormMainForm.ShowComputerOff(const ARememberForegroundWindow: Boolean);
 begin
   // Remember the current foreground window
   if ARememberForegroundWindow then
@@ -843,7 +843,7 @@ begin
   Application.BringToFront;
 end;
 
-procedure TFormMainForm.HideComputerOff(ARestorePreviousWindow: Boolean);
+procedure TFormMainForm.HideComputerOff(const ARestorePreviousWindow: Boolean);
 begin
   Hide;
   WindowState := wsMinimized;

@@ -26,7 +26,7 @@ const
   cHideComputerOffAfter2s = Cardinal(2000);
 
   { GetAbortModalMessage }
-  cAbortModalMessage = 'Abort %s that will occur in %s?';
+  cAbortModalMessage = 'Restart or Abort ''%s'' that will occur in %s?';
 
   { ComputerOffType.ItemIndex -> FComputerOffType -> FComputerOffTypeString }
   cSleep     = Integer(0);

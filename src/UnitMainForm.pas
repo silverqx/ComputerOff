@@ -118,6 +118,7 @@ type
     procedure ResetCountDown;
     procedure ResetCountDownTime;
     procedure ResetCountDownBar; inline;
+    procedure ResetComputerOffTimeouts;
 
     procedure StartCountDown;
 
@@ -559,6 +560,7 @@ begin
 
   ResetCountDownTime;
   ResetCountDownBar;
+  ResetComputerOffTimeouts;
 
   Options.Enabled := True;
 end;
@@ -577,6 +579,14 @@ begin
     Position := 0;
     Max := 100;
   end;
+end;
+
+procedure TFormMainForm.ResetComputerOffTimeouts;
+begin
+  FComputerOffTimeout   := ZeroDateTime;
+  FComputerOffTimeout4h := ZeroDateTime;
+  FComputerOffTimeout1s := ZeroDateTime;
+  FComputerOffTimeout_SecuredRestartAbortModal := ZeroDateTime;
 end;
 
 procedure TFormMainForm.StartCountDown;

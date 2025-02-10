@@ -36,7 +36,6 @@ type
     procedure SecondChange(Sender: TObject);
 
     procedure ComputerOffTypeChange(Sender: TObject);
-    procedure SynchronizeComputerOffType;
 
     procedure TimerComboBoxDropDownTimer(Sender: TObject);
     procedure ComputerOffTypeDropDown(Sender: TObject);
@@ -44,7 +43,9 @@ type
 
   strict private
     FComputerOffTypeOpened: Boolean;
+
     function FindSpinEdit(const AMousePosition: TPoint): TSpinEdit;
+    procedure SynchronizeComputerOffType;
   end;
 
 var
@@ -201,16 +202,6 @@ begin
   FormMainForm.PrepareComputerOffType;
 end;
 
-procedure TFormOptionsDialog.SynchronizeComputerOffType;
-begin
-  // Nothing to do, the countdown timer isn't running (in this case is always in sync)
-  if not FormMainForm.TimerCountDown.Enabled then
-    Exit;
-
-  // Synchronize (edge case)
-  ComputerOffType.ItemIndex := FormMainForm.ComputerOffType;
-end;
-
 procedure TFormOptionsDialog.TimerComboBoxDropDownTimer(Sender: TObject);
 begin
   TimerComboBoxDropDown.Enabled := False;
@@ -256,6 +247,16 @@ begin
   // If TSpinEdit has a focus take it
   if ActiveControl is TSpinEdit then
     Exit(ActiveControl as TSpinEdit);
+end;
+
+procedure TFormOptionsDialog.SynchronizeComputerOffType;
+begin
+  // Nothing to do, the countdown timer isn't running (in this case is always in sync)
+  if not FormMainForm.TimerCountDown.Enabled then
+    Exit;
+
+  // Synchronize (edge case)
+  ComputerOffType.ItemIndex := FormMainForm.ComputerOffType;
 end;
 
 end.

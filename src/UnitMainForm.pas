@@ -133,10 +133,10 @@ type
 
     { ComputerOff }
     procedure PreComputerOff;
-    procedure PauseVideo; inline;
+    class procedure PauseVideo; inline;
 
     procedure ComputerOff;
-    function EnableSeShutdownPrivilege: Boolean;
+    class function EnableSeShutdownPrivilege: Boolean;
     procedure InvokeComputerOff;
 
     { Restart/Abort modal }
@@ -691,7 +691,7 @@ begin
     ShowRestartAbortModal;
 end;
 
-procedure TFormMainForm.PauseVideo;
+class procedure TFormMainForm.PauseVideo;
 begin
   { Pause the Skylink/YouTube video if it's in the foreground, it sends
     the ctrl+alt+shift+p keyboard shortcut that is handled by
@@ -715,7 +715,7 @@ begin
   QuitApplication;
 end;
 
-function TFormMainForm.EnableSeShutdownPrivilege: Boolean;
+class function TFormMainForm.EnableSeShutdownPrivilege: Boolean;
 var
   LNewState: TOKEN_PRIVILEGES;
   LTokenHandle: THandle;

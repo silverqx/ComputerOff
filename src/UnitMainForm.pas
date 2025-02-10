@@ -169,6 +169,8 @@ type
   public
     { UI CountDown related }
     procedure PrepareComputerOffType;
+
+    property ComputerOffType: Integer read FComputerOffType;
   end;
 
 const
@@ -598,6 +600,8 @@ end;
 
 procedure TFormMainForm.PrepareAllCountDownControls;
 begin
+  // Don't remove as it can be out of sync (ComputerOffTypeChange contains if condition)
+  PrepareComputerOffType;
   PrepareCountDown;
   PrepareCountDownBar;
   PrepareComputerOffTimeouts;

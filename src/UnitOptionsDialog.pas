@@ -36,6 +36,7 @@ type
     procedure SecondChange(Sender: TObject);
 
     procedure ComputerOffTypeChange(Sender: TObject);
+    procedure SynchronizeComputerOffType;
 
     procedure TimerComboBoxDropDownTimer(Sender: TObject);
     procedure ComputerOffTypeDropDown(Sender: TObject);
@@ -59,6 +60,8 @@ uses UnitCommon, UnitMainForm;
 
 procedure TFormOptionsDialog.FormShow(Sender: TObject);
 begin
+  SynchronizeComputerOffType;
+
   FocusControl(Minute);
 
   // Center the mouse cursor in the given control
@@ -190,8 +193,22 @@ end;
 
 procedure TFormOptionsDialog.ComputerOffTypeChange(Sender: TObject);
 begin
+  // Nothing to do, the countdown timer is already running
+  if FormMainForm.TimerCountDown.Enabled then
+    Exit;
+
   // Update it immediately
   FormMainForm.PrepareComputerOffType;
+end;
+
+procedure TFormOptionsDialog.SynchronizeComputerOffType;
+begin
+  // Nothing to do, the countdown timer isn't running (in this case is always in sync)
+  if not FormMainForm.TimerCountDown.Enabled then
+    Exit;
+
+  // Synchronize (edge case)
+  ComputerOffType.ItemIndex := FormMainForm.ComputerOffType;
 end;
 
 procedure TFormOptionsDialog.TimerComboBoxDropDownTimer(Sender: TObject);

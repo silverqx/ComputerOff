@@ -400,7 +400,7 @@ begin
   ShowComputerOff(False);
 end;
 
-{ private }
+{ strict private }
 
 { Types }
 

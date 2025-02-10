@@ -228,7 +228,7 @@ begin
   TimerComboBoxDropDown.Enabled := True;
 end;
 
-{ private }
+{ strict private }
 
 function TFormOptionsDialog.FindSpinEdit(const AMousePosition: TPoint): TSpinEdit;
 var

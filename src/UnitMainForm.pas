@@ -58,10 +58,6 @@ type
       Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure TimerThrottleActivateTimer(Sender: TObject);
 
-  public
-    { UI CountDown related }
-    procedure PrepareComputerOffType;
-
   strict private type
     { Types }
     TComputerOffTypeString = record
@@ -169,6 +165,10 @@ type
 
     { TForm Events }
     procedure FormShowCenterMouse(Sender: TObject);
+
+  public
+    { UI CountDown related }
+    procedure PrepareComputerOffType;
   end;
 
 const
@@ -396,19 +396,6 @@ procedure TFormMainForm.TrayIconMainMouseDown(
   Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   ShowComputerOff(False);
-end;
-
-{ public }
-
-{ UI CountDown related }
-
-procedure TFormMainForm.PrepareComputerOffType;
-begin
-  FComputerOffType := FormOptionsDialog.ComputerOffType.ItemIndex;
-  FComputerOffTypeString := FComputerOffTypesHash.Items[FComputerOffType];
-
-  UpdateLabelComputerOff;
-  UpdateButtonComputerOff;
 end;
 
 { private }
@@ -957,6 +944,19 @@ procedure TFormMainForm.FormShowCenterMouse(Sender: TObject);
 begin
   FRestartAbortModalShown := True;
   CenterMouse((Sender as TForm).ActiveControl, False);
+end;
+
+{ public }
+
+{ UI CountDown related }
+
+procedure TFormMainForm.PrepareComputerOffType;
+begin
+  FComputerOffType := FormOptionsDialog.ComputerOffType.ItemIndex;
+  FComputerOffTypeString := FComputerOffTypesHash.Items[FComputerOffType];
+
+  UpdateLabelComputerOff;
+  UpdateButtonComputerOff;
 end;
 
 end.

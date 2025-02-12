@@ -6,13 +6,13 @@ object FormMainForm: TFormMainForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'ComputerOff'
-  ClientHeight = 174
-  ClientWidth = 464
+  ClientHeight = 167
+  ClientWidth = 440
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -20
+  Font.Height = -19
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
@@ -27,13 +27,13 @@ object FormMainForm: TFormMainForm
   OnDestroy = FormDestroy
   OnKeyPress = FormKeyPress
   OnShow = ApplicationActivate
-  PixelsPerInch = 128
-  TextHeight = 24
+  PixelsPerInch = 120
+  TextHeight = 23
   object BevelCountDown: TBevel
     Left = 13
-    Top = 66
-    Width = 289
-    Height = 56
+    Top = 64
+    Width = 273
+    Height = 52
     Margins.Left = 6
     Margins.Top = 6
     Margins.Right = 6
@@ -41,9 +41,9 @@ object FormMainForm: TFormMainForm
   end
   object LabelComputerOff: TLabel
     Left = 20
-    Top = 71
-    Width = 103
-    Height = 17
+    Top = 69
+    Width = 97
+    Height = 16
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -51,16 +51,16 @@ object FormMainForm: TFormMainForm
     Caption = 'Time to Suspend'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -14
+    Font.Height = -13
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
   end
   object LabelCountDown: TLabel
-    Left = 162
-    Top = 71
-    Width = 126
-    Height = 45
+    Left = 152
+    Top = 69
+    Width = 119
+    Height = 42
     Margins.Left = 0
     Margins.Top = 4
     Margins.Right = 4
@@ -69,7 +69,7 @@ object FormMainForm: TFormMainForm
     Caption = '0:00:00'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -37
+    Font.Height = -35
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
@@ -77,8 +77,8 @@ object FormMainForm: TFormMainForm
   object ButtonComputerOff: TButton
     Left = 10
     Top = 10
-    Width = 140
-    Height = 44
+    Width = 132
+    Height = 42
     Margins.Left = 6
     Margins.Top = 6
     Margins.Right = 6
@@ -88,10 +88,10 @@ object FormMainForm: TFormMainForm
     OnClick = ButtonComputerOffClick
   end
   object Stop: TButton
-    Left = 162
+    Left = 154
     Top = 10
-    Width = 140
-    Height = 44
+    Width = 132
+    Height = 42
     Hint = 'Right click opens Options'
     Margins.Left = 6
     Margins.Top = 6
@@ -104,10 +104,10 @@ object FormMainForm: TFormMainForm
     OnMouseUp = StopMouseUp
   end
   object Options: TButton
-    Left = 314
+    Left = 298
     Top = 10
-    Width = 140
-    Height = 44
+    Width = 132
+    Height = 42
     Margins.Left = 6
     Margins.Top = 6
     Margins.Right = 6
@@ -117,10 +117,10 @@ object FormMainForm: TFormMainForm
     OnClick = OptionsClick
   end
   object About: TButton
-    Left = 314
-    Top = 66
-    Width = 140
-    Height = 44
+    Left = 298
+    Top = 64
+    Width = 132
+    Height = 41
     Margins.Left = 6
     Margins.Top = 6
     Margins.Right = 6
@@ -130,10 +130,10 @@ object FormMainForm: TFormMainForm
     OnClick = AboutClick
   end
   object Quit: TButton
-    Left = 314
-    Top = 122
-    Width = 140
-    Height = 42
+    Left = 298
+    Top = 117
+    Width = 132
+    Height = 40
     Margins.Left = 6
     Margins.Top = 6
     Margins.Right = 6
@@ -144,9 +144,9 @@ object FormMainForm: TFormMainForm
   end
   object CountDownBar: TProgressBar
     Left = 11
-    Top = 134
-    Width = 291
-    Height = 30
+    Top = 128
+    Width = 275
+    Height = 28
     Margins.Left = 6
     Margins.Top = 6
     Margins.Right = 6
@@ -158,14 +158,14 @@ object FormMainForm: TFormMainForm
   object TimerCountDown: TTimer
     Enabled = False
     OnTimer = TimerCountDownTimer
-    Left = 47
-    Top = 117
+    Left = 57
+    Top = 127
   end
   object TimerCommon: TTimer
     Interval = 1
     OnTimer = TimerCommonTimer
-    Left = 2
-    Top = 117
+    Left = 12
+    Top = 127
   end
   object TrayIconMain: TTrayIcon
     Icon.Data = {
@@ -981,20 +981,20 @@ object FormMainForm: TFormMainForm
       AC41E1C3AC41F083AC41F007AC41F80FAC41F83FAC41E03FAC41C03FAC41C01F
       AC41E71FAC41FF0FAC41FF07AC41FF87AC41FF83AC41}
     OnMouseDown = TrayIconMainMouseDown
-    Left = 137
-    Top = 122
+    Left = 147
+    Top = 132
   end
   object ApplicationEventsMain: TApplicationEvents
     OnActivate = ApplicationActivate
     OnMinimize = ApplicationEventsMainMinimize
-    Left = 182
-    Top = 122
+    Left = 192
+    Top = 132
   end
   object TimerThrottleActivate: TTimer
     Enabled = False
     Interval = 25
     OnTimer = TimerThrottleActivateTimer
-    Left = 91
-    Top = 119
+    Left = 101
+    Top = 129
   end
 end

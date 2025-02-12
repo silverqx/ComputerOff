@@ -10,13 +10,13 @@ object FormOptionsDialog: TFormOptionsDialog
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Options'
-  ClientHeight = 288
-  ClientWidth = 360
+  ClientHeight = 272
+  ClientWidth = 339
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -23
+  Font.Height = -21
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
@@ -30,39 +30,39 @@ object FormOptionsDialog: TFormOptionsDialog
   OnMouseWheelDown = FormMouseWheelDown
   OnMouseWheelUp = FormMouseWheelUp
   OnShow = FormShow
-  PixelsPerInch = 128
-  TextHeight = 28
+  PixelsPerInch = 120
+  TextHeight = 25
   object PanelMain: TPanel
     AlignWithMargins = True
     Left = 10
     Top = 10
-    Width = 340
-    Height = 203
+    Width = 319
+    Height = 192
     Margins.Left = 6
     Margins.Top = 6
     Margins.Right = 6
-    Margins.Bottom = 16
+    Margins.Bottom = 15
     AutoSize = True
     BevelKind = bkFlat
     BevelOuter = bvNone
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -23
+    Font.Height = -22
     Font.Name = 'Tahoma'
     Font.Style = []
-    Padding.Left = 15
-    Padding.Top = 15
-    Padding.Right = 15
-    Padding.Bottom = 15
+    Padding.Left = 14
+    Padding.Top = 14
+    Padding.Right = 14
+    Padding.Bottom = 14
     ParentFont = False
     ShowCaption = False
     TabOrder = 0
     OnMouseUp = FormMouseUp
     object LabelTimeout: TLabel
-      Left = 15
-      Top = 15
-      Width = 129
-      Height = 28
+      Left = 14
+      Top = 14
+      Width = 121
+      Height = 27
       Margins.Left = 6
       Margins.Top = 6
       Margins.Right = 6
@@ -71,16 +71,16 @@ object FormOptionsDialog: TFormOptionsDialog
       FocusControl = Hour
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -23
+      Font.Height = -22
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
     end
     object LabelColon1: TLabel
-      Left = 108
-      Top = 56
-      Width = 9
-      Height = 30
+      Left = 101
+      Top = 53
+      Width = 8
+      Height = 28
       Margins.Left = 6
       Margins.Top = 6
       Margins.Right = 6
@@ -88,16 +88,16 @@ object FormOptionsDialog: TFormOptionsDialog
       Caption = ':'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -25
+      Font.Height = -23
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
     end
     object LabelColon2: TLabel
-      Left = 219
-      Top = 53
-      Width = 10
-      Height = 34
+      Left = 205
+      Top = 50
+      Width = 9
+      Height = 31
       Margins.Left = 6
       Margins.Top = 6
       Margins.Right = 6
@@ -105,16 +105,16 @@ object FormOptionsDialog: TFormOptionsDialog
       Caption = ':'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -28
+      Font.Height = -26
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
     end
     object LabelComputerOffType: TLabel
-      Left = 15
-      Top = 108
-      Width = 180
-      Height = 28
+      Left = 14
+      Top = 101
+      Width = 172
+      Height = 27
       Margins.Left = 6
       Margins.Top = 6
       Margins.Right = 6
@@ -123,16 +123,16 @@ object FormOptionsDialog: TFormOptionsDialog
       FocusControl = ComputerOffType
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -23
+      Font.Height = -22
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
     end
     object Hour: TSpinEdit
-      Left = 15
-      Top = 55
-      Width = 81
-      Height = 38
+      Left = 14
+      Top = 52
+      Width = 76
+      Height = 37
       Margins.Left = 6
       Margins.Top = 6
       Margins.Right = 6
@@ -140,7 +140,7 @@ object FormOptionsDialog: TFormOptionsDialog
       EditorEnabled = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -23
+      Font.Height = -22
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       MaxLength = 2
@@ -152,10 +152,10 @@ object FormOptionsDialog: TFormOptionsDialog
       OnChange = HourChange
     end
     object Minute: TSpinEdit
-      Left = 128
-      Top = 55
-      Width = 81
-      Height = 38
+      Left = 120
+      Top = 52
+      Width = 76
+      Height = 37
       Margins.Left = 6
       Margins.Top = 6
       Margins.Right = 6
@@ -163,7 +163,7 @@ object FormOptionsDialog: TFormOptionsDialog
       EditorEnabled = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -23
+      Font.Height = -22
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       Increment = 30
@@ -176,10 +176,10 @@ object FormOptionsDialog: TFormOptionsDialog
       OnChange = MinuteChange
     end
     object Second: TSpinEdit
-      Left = 240
-      Top = 55
-      Width = 81
-      Height = 38
+      Left = 225
+      Top = 52
+      Width = 76
+      Height = 37
       Margins.Left = 6
       Margins.Top = 6
       Margins.Right = 6
@@ -187,7 +187,7 @@ object FormOptionsDialog: TFormOptionsDialog
       EditorEnabled = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -23
+      Font.Height = -22
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       Increment = 5
@@ -200,10 +200,10 @@ object FormOptionsDialog: TFormOptionsDialog
       OnChange = SecondChange
     end
     object ComputerOffType: TComboBox
-      Left = 15
-      Top = 148
-      Width = 306
-      Height = 36
+      Left = 14
+      Top = 139
+      Width = 287
+      Height = 35
       Margins.Left = 6
       Margins.Top = 6
       Margins.Right = 6
@@ -211,7 +211,7 @@ object FormOptionsDialog: TFormOptionsDialog
       Style = csDropDownList
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -23
+      Font.Height = -22
       Font.Name = 'Tahoma'
       Font.Style = []
       ItemIndex = 0
@@ -229,11 +229,11 @@ object FormOptionsDialog: TFormOptionsDialog
   end
   object OK: TButton
     Left = 10
-    Top = 229
-    Width = 151
-    Height = 53
+    Top = 217
+    Width = 142
+    Height = 49
     Margins.Left = 6
-    Margins.Top = 6
+    Margins.Top = 0
     Margins.Right = 6
     Margins.Bottom = 6
     Caption = '&OK'
@@ -242,12 +242,12 @@ object FormOptionsDialog: TFormOptionsDialog
     OnMouseUp = FormMouseUp
   end
   object Cancel: TButton
-    Left = 198
-    Top = 229
-    Width = 152
-    Height = 53
+    Left = 187
+    Top = 217
+    Width = 142
+    Height = 49
     Margins.Left = 6
-    Margins.Top = 6
+    Margins.Top = 0
     Margins.Right = 6
     Margins.Bottom = 6
     Caption = '&Cancel'
@@ -258,7 +258,7 @@ object FormOptionsDialog: TFormOptionsDialog
   object TimerComboBoxDropDown: TTimer
     Interval = 10
     OnTimer = TimerComboBoxDropDownTimer
-    Left = 296
+    Left = 276
     Top = 21
   end
 end

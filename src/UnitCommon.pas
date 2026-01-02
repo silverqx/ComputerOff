@@ -9,6 +9,9 @@ uses Winapi.Windows, Vcl.Controls;
 { Center the mouse cursor in the given control }
 procedure CenterMouse(AControl: TWinControl; const AFocus: Boolean = True);
 
+{ Debug Log }
+procedure Log(const AMessage: string);
+
 { Others }
 
 { No-op function }
@@ -26,7 +29,9 @@ type
 
 implementation
 
-uses System.Types, System.Math, System.SysUtils, System.TypInfo;
+uses
+  System.Types, System.Math, System.SysUtils, System.TypInfo, System.IOUtils,
+  UnitConstants;
 
 { ComputerOff }
 
@@ -55,6 +60,16 @@ begin
 
   // Restore
   SetRoundMode(LRoundModeOriginal);
+end;
+
+{ Debug Log }
+procedure Log(const AMessage: string);
+var
+  LDateTimeString: string;
+begin
+  DateTimeToString(LDateTimeString, 'yyyy-mm-dd hh:nn:ss', Now);
+  TFile.AppendAllText(cLogFilepath,
+    Format('%s: %s%s', [LDateTimeString, AMessage, sLineBreak]));
 end;
 
 { Others }

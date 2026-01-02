@@ -48,6 +48,9 @@ const
   { PauseVideo }
   cPauseVideoAhkFilepath = 'E:\autohotkey\os-global\Src\ComputerOff\PauseVideo.ahk';
 
+  { Debug Log }
+  cLogFilepath = 'E:\tmp\ComputerOff.log';
+
   { Others }
 var
   ZeroDateTime: TDateTime = 0;

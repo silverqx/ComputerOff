@@ -109,6 +109,7 @@ type
     function IsZeroCountDownTime: Boolean;
 
     { UI CountDown related }
+    procedure StopCountDown;
     procedure RestartCountDown;
 
     procedure ResetCountDown;
@@ -141,7 +142,7 @@ type
 
     { Restart/Abort modal }
     procedure ShowRestartAbortModal;
-    procedure HandleRestartAbortModalResult(const AModalResult: Integer);
+    function HandleRestartAbortModalResult(const AModalResult: Integer): Boolean;
 
     function CreateRestartAbortModal: TForm;
     function GetRestartAbortModalMessage: string;
@@ -377,11 +378,7 @@ end;
 
 procedure TFormMainForm.StopClick(Sender: TObject);
 begin
-  // Stop the timer to hide the ComputerOff application
-  if TimerCommon.Interval = cHideComputerOffAfter2s then
-    TimerCommon.Enabled := False;
-
-  ResetCountDown;
+  StopCountDown;
   CenterMouse(Options);
 end;
 
@@ -532,6 +529,15 @@ begin
 end;
 
 { UI CountDown related }
+
+procedure TFormMainForm.StopCountDown;
+begin
+  // Stop the timer to hide the ComputerOff application
+  if TimerCommon.Interval = cHideComputerOffAfter2s then
+    TimerCommon.Enabled := False;
+
+  ResetCountDown;
+end;
 
 procedure TFormMainForm.RestartCountDown;
 begin
@@ -771,34 +777,49 @@ begin
   LModalResult := CreateRestartAbortModal.ShowModal;
   FreeRestartAbortModal;
 
-  // Restore the previously recorded foreground window
-  RestorePreviousWindow;
-
-  HandleRestartAbortModalResult(LModalResult);
+  if HandleRestartAbortModalResult(LModalResult) then
+    // Restore the previously recorded foreground window
+    RestorePreviousWindow;
 end;
 
-procedure TFormMainForm.HandleRestartAbortModalResult(const AModalResult: Integer);
+function TFormMainForm.HandleRestartAbortModalResult(
+  const AModalResult: Integer): Boolean;
+const
+  mrRestart = mrRetry;
+  mrQuit    = mrAbort;
+  mrStop    = mrClose;
 begin
   case AModalResult of
-    mrRetry: RestartCountDown;
-    mrAbort: QuitApplication;
+    mrRestart: RestartCountDown;
+    mrQuit:    QuitApplication;
+    mrStop:    StopCountDown;
+    mrCancel:  HideComputerOff(False);
   else
     HideComputerOff(False);
   end;
+
+  // Don't restore the previously recorded foreground window if the result is mrStop
+  Result := AModalResult <> mrStop;
 end;
 
 function TFormMainForm.CreateRestartAbortModal: TForm;
 const
   mbRestart = mbRetry;
   mbQuit    = mbAbort;
-  mbRestartQuitCancel = [mbRestart, mbQuit, mbCancel];
+  mbStop    = mbClose;
+  mbRestartQuitCancel = [mbCancel, mbQuit, mbRestart, mbStop];
 begin
   { I'll assign it directly here even though this isn't good coding practice because
     there's no need to reuse this method. This allows me to call ShowModal directly
-    on the return value. }
+    on the return value.
+    The CustomButtonCaptions must be in the order of mbXyz indexes because the Buttons
+    argument is looped like: for B := Low(TMsgDlgBtn) to High(TMsgDlgBtn) and then it's
+    queried using LIndex := -1; Inc(LIndex).
+    Which also means the mbRestartQuitCancel can be in any order and we can't define our
+    own order as buttons will always be rendered by their ordinal value. }
   FRestartAbortModal :=
     CreateMessageDialog(GetRestartAbortModalMessage, mtConfirmation, mbRestartQuitCancel,
-      mbRetry, ['&Cancel', '&Quit', '&Restart']);
+      mbRetry, ['&Cancel', '&Quit', '&Restart', '&Stop']);
 
   with FRestartAbortModal do
   begin

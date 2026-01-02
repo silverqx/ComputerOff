@@ -349,11 +349,13 @@ end;
 
 procedure TFormMainForm.ButtonComputerOffClick(Sender: TObject);
 begin
+  Log('ButtonComputerOffClick');
   ComputerOff;
 end;
 
 procedure TFormMainForm.OptionsClick(Sender: TObject);
 begin
+  Log('OptionsClick: ShowModal');
   // Nothing to do, Options modal has been canceled
   if FormOptionsDialog.ShowModal <> mrOk then
     Exit;
@@ -373,11 +375,13 @@ end;
 
 procedure TFormMainForm.QuitClick(Sender: TObject);
 begin
+  Log('QuitClick');
   QuitApplication;
 end;
 
 procedure TFormMainForm.StopClick(Sender: TObject);
 begin
+  Log('StopClick');
   StopCountDown;
   CenterMouse(Options);
 end;
@@ -508,11 +512,17 @@ begin
   { Secured quit, eg. when PC was suspended at night and resumed the next day to avoid
     accidentally calling ComputerOff function. }
   if LNow > FComputerOffTimeout4h then
-    QuitApplication
+  begin
+    Log('HandleMissedTimeouts: QuitApplication');
+    QuitApplication;
+  end
 
   // Secured ComputerOff, eg. if the process was paused or suspended (edge case)
   else if LNow > FComputerOffTimeout1s then
+  begin
+    Log('HandleMissedTimeouts: ComputerOff');
     ComputerOff;
+  end;
 end;
 
 { OptionsClick }
@@ -532,6 +542,8 @@ end;
 
 procedure TFormMainForm.StopCountDown;
 begin
+  Log('StopCountDown');
+
   // Stop the timer to hide the ComputerOff application
   if TimerCommon.Interval = cHideComputerOffAfter2s then
     TimerCommon.Enabled := False;
@@ -541,6 +553,8 @@ end;
 
 procedure TFormMainForm.RestartCountDown;
 begin
+  Log('RestartCountDown');
+
   // Putting this here to avoid a weird logic in the ShowRestartAbortModal
   HideComputerOff(False);
 
@@ -613,6 +627,8 @@ begin
   PrepareComputerOffTimeouts;
 
   UpdateLabelCountDown;
+  Log(Format('PrepareAllCountDownControls: %s (%s)',
+    [TimeToStr(FCountDownTime.GetTime), FComputerOffTypeString.Name]));
 end;
 
 procedure TFormMainForm.PrepareCountDown;
@@ -687,7 +703,10 @@ begin
   else if (FRestartAbortModal <> nil) and FRestartAbortModalShown and LIsMin0 and
           (FCountDownTime.Second = cCloseRestartAbortModalThreshold)
   then
-    FRestartAbortModal.Close // Sets mrCancel result (don't call FreeAndNil here)
+  begin
+    Log('PreComputerOff: Close the Restart/Abort modal dialog');
+    FRestartAbortModal.Close; // Sets mrCancel result (don't call FreeAndNil here)
+  end
 
   { Show model dialog that allows to Restart or Abort the current countdown
     2m55s before ComputerOff action (5s after LG TV). }
@@ -699,6 +718,7 @@ end;
 
 class procedure TFormMainForm.PauseVideo;
 begin
+  Log('PauseVideo');
   { Pause the Skylink/YouTube video if it's in the foreground, it sends
     the ctrl+alt+shift+p keyboard shortcut that is handled by
     the Tampermonkey. }
@@ -707,6 +727,7 @@ end;
 
 procedure TFormMainForm.ComputerOff;
 begin
+  Log('ComputerOff');
   // Nothing to do, already in the shutdown process invoked by another condition
   if FShuttingDown then
     Exit;
@@ -751,6 +772,8 @@ const
   LcSHTDNPlanned =
     LSHTDN_REASON_MAJOR_OTHER or LSHTDN_REASON_MINOR_OTHER or LSHTDN_REASON_FLAG_PLANNED;
 begin
+  Log('InvokeComputerOff');
+
   case FComputerOffType of
 {$ifdef DEBUG}
     cSleep:     Winapi.Windows.Beep(2300, 120);
@@ -770,6 +793,8 @@ procedure TFormMainForm.ShowRestartAbortModal;
 var
   LModalResult: Integer;
 begin
+  Log('ShowRestartAbortModal');
+
   // Remember the current foreground window
   FhForegroundWindow := GetForegroundWindow;
   ShowComputerOff;
@@ -867,6 +892,7 @@ end;
 
 procedure TFormMainForm.HideComputerOff(const ARestorePreviousWindow: Boolean);
 begin
+  Log('HideComputerOff');
   Hide;
   WindowState := wsMinimized;
   TrayIconMain.Visible := True;
@@ -894,6 +920,7 @@ end;
 
 procedure TFormMainForm.QuitApplication;
 begin
+  Log('QuitApplication');
   Close;
 
   TimerCountDown.Enabled := False;

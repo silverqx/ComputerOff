@@ -627,8 +627,10 @@ begin
   PrepareComputerOffTimeouts;
 
   UpdateLabelCountDown;
-  Log(Format('PrepareAllCountDownControls: %s (%s)',
-    [TimeToStr(FCountDownTime.GetTime), FComputerOffTypeString.Name]));
+  Log(Format('PrepareAllCountDownControls: %s (%s)', [
+    TimeToStr(FCountDownTime.GetTime, TFormatSettings.Create('sk-SK')),
+    FComputerOffTypeString.Name
+  ]));
 end;
 
 procedure TFormMainForm.PrepareCountDown;
@@ -663,7 +665,8 @@ end;
 
 procedure TFormMainForm.UpdateLabelCountDown;
 begin
-  LabelCountDown.Caption := TimeToStr(FCountDownTime.GetTime);
+  LabelCountDown.Caption :=
+    TimeToStr(FCountDownTime.GetTime, TFormatSettings.Create('sk-SK'));
 end;
 
 function TFormMainForm.ComputeCountDownBarMax;
